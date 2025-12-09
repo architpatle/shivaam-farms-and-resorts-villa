@@ -384,7 +384,7 @@ const Booking = () => {
                 }
                 return acc;
               }, {})}
-              villas={["All Villas","Sample Villa","Ishaan Villa","Khetan Villa","Pandhari Villa","Patel Villa","More Villa","Madan Villa","Villa 8","Villa 9","Villa 10"]}
+           villas={["All Villas","Sample Villa","Khetan Villa","Madan Villa","Pandhari Villa","Dormitory Villa","Tidke Villa","Ishan Villa","Cottage Villa","Krishna Villa","Motvani Villa","Bhatkar villa"]}
               bookedByDate={bookings.reduce((acc, b) => {
                 if (b.checkIn && b.checkOut) {
                   const start = new Date(b.checkIn);

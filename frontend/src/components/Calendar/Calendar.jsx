@@ -5,19 +5,21 @@ const Calendar = ({
   initialDate = new Date(),
   onDateSelect = () => { },
   bookedDatesByVilla = {},
-  villas = [
+ villas = [
     "All Villas",
     "Sample Villa",
-    "Ishaan Villa",
     "Khetan Villa",
-    "Pandhari Villa",
-    "Patel Villa",
-    "More Villa",
     "Madan Villa",
-    "Villa 8",
-    "Villa 9",
-    "Villa 10"
+    "Pandhari Villa",
+    "Dormitory Villa",
+    "Tidke Villa",
+    "Ishan Villa",
+    "Cottage Villa",
+    "Krishna Villa",
+    "Motvani Villa",
+    "Bhatkar villa",
   ],
+  
 }) => {
 
   const [date, setDate] = useState(initialDate);
