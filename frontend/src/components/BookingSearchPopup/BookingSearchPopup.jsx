@@ -4,16 +4,18 @@ import "./BookingSearchPopup.css";
 
 // Base color palette
 const baseColors = [
-  "#FF6B6B",
-  "#4ECDC4",
-  "#FFD93D",
-  "#1A535C",
-  "#FF6F91",
-  "#6A4C93",
-  "#FF9F1C",
-  "#2EC4B6",
-  "#E71D36",
-  "#9B5DE5",
+   "#009494", // complement of #FF6B6B
+    "#B1323B", // complement of #4ECDC4
+    "#0026C2", // complement of #FFD93D
+    "#E22E5E", // complement of #1DD1A1
+    "#A0D832", // complement of #5F27CD
+    "#B72404", // complement of #48DBFB
+    "#0C97E1", // complement of #F368E0
+    "#EF537B", // complement of #10AC84
+    "#0060BC", // complement of #FF9F43
+    "#C4E068", // complement of #341F97
+    "#d927dfff", // complement of #341F97
+
 ];
 
 // Generate a color for any villa number
@@ -52,7 +54,7 @@ useEffect(() => {
   const filtered = bookings.filter(
     (b) =>
       b.guest?.toLowerCase().includes(query.toLowerCase()) ||
-      b.email?.toLowerCase().includes(query.toLowerCase()) ||
+      // b.email?.toLowerCase().includes(query.toLowerCase()) ||
       b.villa?.toLowerCase().includes(query.toLowerCase()) ||
       b.phone?.toLowerCase().includes(query.toLowerCase())
   );
@@ -95,7 +97,7 @@ useEffect(() => {
         <input
           type="text"
           className="form-control mb-3"
-          placeholder="Search by guest, villa, email, or phone..."
+          placeholder="Search by guest, villa, or phone..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           autoFocus
@@ -134,7 +136,7 @@ useEffect(() => {
                   {formatDate(b.check_out || b.checkOut)}
                 </div>
                 <div className="small mb-1">
-                  {b.email} |  {b.phone} |  Guests: {b.guests || 1}
+                      {b.phone} |  Guests: {b.guests || 1}
                 </div>
 
                 <div className="small mb-1"> Payment: {b.payment_mode || "-"}</div>

@@ -102,7 +102,7 @@ const Booking = () => {
       const mappedBookings = json.data.map((b) => ({
         id: b.id,
         guest: b.guest,
-        email: b.email,
+        // email: b.email,
         phone: b.phone,
         villa: b.villa,
         checkIn: b.check_in,
@@ -118,12 +118,12 @@ const Booking = () => {
         gst_amount: Number(b.gst_amount || 0),
         total_amount: Number(b.total_amount || 0),
         advanced_amount: Number(b.advanced_amount || 0),
-        remaining_amount: Number(b.remaining_amount || 0),
+        // remaining_amount: Number(b.remaining_amount || 0),
         payment_mode: b.payment_mode,
         payment_category: b.payment_category,
         received_by: b.received_by,
         address: b.address,
-        aadhar: b.aadhar,
+        // aadhar: b.aadhar,
       }));
 
       setBookings(mappedBookings.sort((a, b) => Number(b.id) - Number(a.id)));
@@ -293,7 +293,7 @@ const Booking = () => {
                       <th>Payment Mode</th>
                       <th>Payment Category</th>
                       <th>Customer Payment (₹)</th>
-                      <th>Aadhar</th>
+                      {/* <th>Aadhar</th> */}
                       <th>Address</th>
                       <th>Actions</th>
                     </tr>
@@ -304,7 +304,7 @@ const Booking = () => {
                       <tr key={index}>
                         <td className="text-sm-start text-center">
                           <div className="fw-bold">{b.guest}</div>
-                          <small className="text-muted">{b.email}</small>
+                          {/* <small className="text-muted">{b.email}</small> */}
                         </td>
                         <td>
                           <div className="d-flex align-items-center justify-content-center">
@@ -348,7 +348,7 @@ const Booking = () => {
                         <td>{b.payment_mode || "-"}</td>
                         <td>{b.payment_category || "-"}</td>
                         <td>{b.payment_category === "Advanced" ? `₹ ${b.advanced_amount || 0}` : `₹ ${b.total_amount || 0}`}</td>
-                        <td>{b.aadhar}</td>
+                        {/* <td>{b.aadhar}</td> */}
                         <td style={{ maxWidth: "200px", whiteSpace: "normal" }}>{b.address}</td>
                         <td>
                           <button className="btn btn-sm btn-outline-primary me-1" onClick={() => { setSelectedBooking(b); setShowEditBooking(true); }}>
