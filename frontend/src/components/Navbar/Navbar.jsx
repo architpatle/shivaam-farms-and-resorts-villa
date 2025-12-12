@@ -42,7 +42,7 @@ const Navbar = ({ toggleSidebar }) => {
         <img src={logo} style={{ height: "40px" }} alt="" onClick={() => navigate("/")} />
 
         {/* Push user info to the right */}
-        <div className="ms-auto d-flex align-items-center">
+        {/* <div className="ms-auto d-flex align-items-center">
           <Link
             className="navbar-brand d-flex align-items-center gap-2 fs-6"
             to="/"
@@ -50,7 +50,7 @@ const Navbar = ({ toggleSidebar }) => {
             <GoPeople />
             User Name
           </Link>
-        </div>
+        </div> */}
       </div>
     </nav>
   );

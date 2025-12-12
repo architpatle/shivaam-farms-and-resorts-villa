@@ -31,8 +31,6 @@ const Stocks = () => {
   }, []);
 
 
-
-
   const [formData, setFormData] = useState({
     itemname: "",
     villa: "",
@@ -118,7 +116,7 @@ const Stocks = () => {
               {selectedVilla} {/* Show selected villa */}
             </button>
             <ul className="dropdown-menu" aria-labelledby="villasDropdown">
-              {["All Villas", "Sample Villa", "Ishaan Villa", "Khetan Villa", "Pandhari Villa", "Patel Villa", "More Villa", "Madan Villa", "Villa 8", "Villa 9", "villa east"].map(villa => (
+              {["All Villas", "Sample Villa", "Khetan Villa", "Madan Villa", "Pandhari Villa", "Dormitory Villa", "Tidke Villa", "Ishan Villa", "Cottage Villa", "Krishna Villa", "Motvani villa", "Bhatkar villa"].map(villa => (
                 <li key={villa}>
                   <a
                     className="dropdown-item"
@@ -145,7 +143,7 @@ const Stocks = () => {
           items={items.filter(
             (item) => item.category?.toLowerCase() === "furniture"
           )}
-        />  
+        />
       )
     },
     {
@@ -426,15 +424,17 @@ const Stocks = () => {
                 <select name="villa" value={formData.villa} onChange={handleChange} style={inputStyle}>
                   <option>Select Villa</option>
                   <option>Sample Villa</option>
-                  <option>Ishaan Villa</option>
                   <option>Khetan Villa</option>
-                  <option>Pandhari Villa</option>
-                  <option>Patel Villa</option>
-                  <option>More Villa</option>
                   <option>Madan Villa</option>
-                  <option>Villa 8</option>
-                  <option>Villa 9</option>
-                  <option>Villa east</option>
+                  <option>Pandhari Villa</option>
+                  <option>Dormitory Villa</option>
+                  <option>Tidke Villa</option>
+                  <option>Ishan Villa</option>
+                  <option>Cottage Villa</option>
+                  <option>Krishna Villa</option>
+                  <option>Motvani Villa</option>
+                  <option>Bhatkar Villa</option>
+
                 </select>
               </div>
 

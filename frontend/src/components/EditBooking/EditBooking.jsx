@@ -6,10 +6,10 @@ const EditBooking = ({ booking, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     id: null,
     guest: "",
-    email: "",
+    // email: "",
     phone: "",
     address: "",
-    aadhar: "",
+    // aadhar: "",
     villa: "",
     checkIn: "",
     checkOut: "",
@@ -33,10 +33,10 @@ const EditBooking = ({ booking, onClose, onSave }) => {
     setFormData({
       id: booking.id,
       guest: booking.guest ?? "",
-      email: booking.email ?? "",
+      // email: booking.email ?? "",
       phone: booking.phone ?? "",
       address: booking.address ?? "",
-      aadhar: booking.aadhar ? booking.aadhar.replace(/\s/g, "") : "",
+      // aadhar: booking.aadhar ? booking.aadhar.replace(/\s/g, "") : "",
       villa: booking.villa ?? "",
       checkIn: booking.checkIn ?? "",
       checkOut: booking.checkOut ?? "",
@@ -74,11 +74,11 @@ const EditBooking = ({ booking, onClose, onSave }) => {
     }));
   }, [formData.baseAmount, formData.gstType, formData.paymentCategory, formData.advancedAmount]);
 
-  const handleAadhar = (val) => {
-    let digits = String(val).replace(/\D/g, "").slice(0, 12);
-    const formatted = digits.replace(/(\d{4})(?=\d)/g, "$1 ");
-    setFormData((p) => ({ ...p, aadhar: formatted }));
-  };
+  // const handleAadhar = (val) => {
+  //   let digits = String(val).replace(/\D/g, "").slice(0, 12);
+  //   const formatted = digits.replace(/(\d{4})(?=\d)/g, "$1 ");
+  //   setFormData((p) => ({ ...p, aadhar: formatted }));
+  // };
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -94,10 +94,10 @@ const EditBooking = ({ booking, onClose, onSave }) => {
     const payload = {
       id: formData.id,
       guest: formData.guest,
-      email: formData.email,
+      // email: formData.email,
       phone: formData.phone || null,
       address: formData.address || null,
-      aadhar: formData.aadhar.replace(/\s/g, ""),
+      // aadhar: formData.aadhar.replace(/\s/g, ""),
       villa: formData.villa,
       checkIn: formData.checkIn,
       checkOut: formData.checkOut,
@@ -160,10 +160,10 @@ const EditBooking = ({ booking, onClose, onSave }) => {
               <textarea name="address" value={formData.address} onChange={handleChange} className="form-control" rows="2" />
             </div>
 
-            <div className="col-12 col-sm-6">
+            {/* <div className="col-12 col-sm-6">
               <label>Aadhar</label>
               <input name="aadhar" value={formData.aadhar} onChange={(e) => handleAadhar(e.target.value)} className="form-control" maxLength={14} />
-            </div>
+            </div> */}
 
             <div className="col-12 col-sm-6">
               <label>Check-in</label>

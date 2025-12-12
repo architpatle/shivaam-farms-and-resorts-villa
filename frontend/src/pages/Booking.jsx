@@ -58,6 +58,9 @@ const Booking = () => {
 
   const [bookings, setBookings] = useState([]);
 
+  const role = localStorage.getItem("role");
+  const isExecutive = role === "executive";
+
   // Filters
   const filteredBookings = bookings.filter(
     (b) =>
@@ -102,7 +105,7 @@ const Booking = () => {
       const mappedBookings = json.data.map((b) => ({
         id: b.id,
         guest: b.guest,
-        email: b.email,
+        // email: b.email,
         phone: b.phone,
         villa: b.villa,
         checkIn: b.check_in,
@@ -123,7 +126,7 @@ const Booking = () => {
         payment_category: b.payment_category,
         received_by: b.received_by,
         address: b.address,
-        aadhar: b.aadhar,
+        // aadhar: b.aadhar,
       }));
 
       setBookings(mappedBookings.sort((a, b) => Number(b.id) - Number(a.id)));
@@ -280,22 +283,25 @@ const Booking = () => {
                       <th>Dates</th>
                       <th>Guests</th>
                       <th>Status</th>
-                      <th>Received By</th>
-                      <th>Base Amount (₹)</th>
-                      <th>GST Type</th>
-                      <th>CGST (₹)</th>
-                      <th>SGST (₹)</th>
-                      <th>IGST (₹)</th>
-                      <th>GST Total (₹)</th>
-                      <th>Total Amount (₹)</th>
-                      <th>Advance (₹)</th>
-                      <th>Balance</th>
-                      <th>Payment Mode</th>
-                      <th>Payment Category</th>
-                      <th>Customer Payment (₹)</th>
-                      <th>Aadhar</th>
-                      <th>Address</th>
-                      <th>Actions</th>
+                      {!isExecutive && (
+                        <>
+                          <th>Received By</th>
+                          <th>Base Amount (₹)</th>
+                          <th>GST Type</th>
+                          <th>CGST (₹)</th>
+                          <th>SGST (₹)</th>
+                          <th>IGST (₹)</th>
+                          <th>GST Total (₹)</th>
+                          <th>Total Amount (₹)</th>
+                          <th>Advance (₹)</th>
+                          <th>Balance</th>
+                          <th>Payment Mode</th>
+                          <th>Payment Category</th>
+                          <th>Customer Payment (₹)</th>
+                          <th>Address</th>
+                          <th>Actions</th>
+                        </>
+                      )}
                     </tr>
                   </thead>
 
@@ -304,7 +310,7 @@ const Booking = () => {
                       <tr key={index}>
                         <td className="text-sm-start text-center">
                           <div className="fw-bold">{b.guest}</div>
-                          <small className="text-muted">{b.email}</small>
+                          {/* <small className="text-muted">{b.email}</small> */}
                         </td>
                         <td>
                           <div className="d-flex align-items-center justify-content-center">
@@ -324,43 +330,61 @@ const Booking = () => {
                         </td>
                         <td>
                           <span
-                            className={`badge rounded-pill px-3 py-2 ${
-                              b.payment_category === "Total" || Number(b.remaining_amount) === 0
-                                ? "bg-success-subtle text-success"
-                                : b.status === "Pending"
+                            className={`badge rounded-pill px-3 py-2 ${b.payment_category === "Total" || Number(b.remaining_amount) === 0
+                              ? "bg-success-subtle text-success"
+                              : b.status === "Pending"
                                 ? "bg-warning-subtle text-warning"
                                 : "bg-primary-subtle text-primary"
-                            }`}
+                              }`}
                           >
                             {b.payment_category === "Total" || Number(b.remaining_amount) === 0 ? "Confirmed" : b.status}
                           </span>
                         </td>
-                        <td>{b.received_by || "-"}</td>
-                        <td>₹ {b.base_amount}</td>
-                        <td>{b.gst_type}</td>
-                        <td>₹ {b.cgst_amount}</td>
-                        <td>₹ {b.sgst_amount}</td>
-                        <td>₹ {b.igst_amount}</td>
-                        <td>₹ {b.gst_amount}</td>
-                        <td>₹ {b.total_amount}</td>
-                        <td>₹ {b.advanced_amount}</td>
-                        <td>{b.payment_category === "Advanced" ? `₹ ${b.remaining_amount || 0}` : b.payment_category === "Total" ? "0" : "-"}</td>
-                        <td>{b.payment_mode || "-"}</td>
-                        <td>{b.payment_category || "-"}</td>
-                        <td>{b.payment_category === "Advanced" ? `₹ ${b.advanced_amount || 0}` : `₹ ${b.total_amount || 0}`}</td>
-                        <td>{b.aadhar}</td>
-                        <td style={{ maxWidth: "200px", whiteSpace: "normal" }}>{b.address}</td>
-                        <td>
-                          <button className="btn btn-sm btn-outline-primary me-1" onClick={() => { setSelectedBooking(b); setShowEditBooking(true); }}>
-                            <FaEdit />
-                          </button>
-                          <button className="btn btn-sm btn-outline-danger px-2 me-1" onClick={() => handleDeleteBooking(b.id)}>
-                            <FaTrash />
-                          </button>
-                          <button className="btn btn-sm btn-outline-primary px-2 me-1" onClick={() => setShowInvoice(true)}>
-                            <FaFileCsv />
-                          </button>
-                        </td>
+                        {!isExecutive && (
+                          <>
+                            <td>{b.received_by || "-"}</td>
+                            <td>₹ {b.base_amount}</td>
+                            <td>{b.gst_type}</td>
+                            <td>₹ {b.cgst_amount}</td>
+                            <td>₹ {b.sgst_amount}</td>
+                            <td>₹ {b.igst_amount}</td>
+                            <td>₹ {b.gst_amount}</td>
+                            <td>₹ {b.total_amount}</td>
+                            <td>₹ {b.advanced_amount}</td>
+                            <td>
+                              {b.payment_category === "Advanced"
+                                ? `₹ ${b.remaining_amount || 0}`
+                                : b.payment_category === "Total"
+                                  ? "0"
+                                  : "-"}
+                            </td>
+                            <td>{b.payment_mode || "-"}</td>
+                            <td>{b.payment_category || "-"}</td>
+                            <td>
+                              {b.payment_category === "Advanced"
+                                ? `₹ ${b.advanced_amount || 0}`
+                                : `₹ ${b.total_amount || 0}`}
+                            </td>
+                            <td style={{ maxWidth: "200px", whiteSpace: "normal" }}>
+                              {b.address}
+                            </td>
+                            <td>
+                              <button className="btn btn-sm btn-outline-primary me-1" onClick={() => { setSelectedBooking(b); setShowEditBooking(true); }}>
+                                <FaEdit />
+                              </button>
+                              <button className="btn btn-sm btn-outline-danger px-2 me-1" onClick={() => handleDeleteBooking(b.id)}>
+                                <FaTrash />
+                              </button>
+                              <button className="btn btn-sm btn-outline-primary px-2 me-1" onClick={() => {
+                                setSelectedBooking(b);
+                                setShowInvoice(true);
+                              }}
+                              >
+                                <FaFileCsv />
+                              </button>
+                            </td>
+                          </>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -376,24 +400,27 @@ const Booking = () => {
                   const start = new Date(b.checkIn);
                   const end = new Date(b.checkOut);
                   const current = new Date(start);
-                  while (current <= end) {
-                    const formatted = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2,"0")}-${String(current.getDate()).padStart(2,"0")}`;
+                  while (current < end) {   // ✔ FIXED
+                    const formatted =
+                      `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, "0")}-${String(current.getDate()).padStart(2, "0")}`;
                     acc[b.villa].push(formatted);
                     current.setDate(current.getDate() + 1);
                   }
                 }
                 return acc;
               }, {})}
-              villas={["All Villas","Sample Villa","Ishaan Villa","Khetan Villa","Pandhari Villa","Patel Villa","More Villa","Madan Villa","Villa 8","Villa 9","Villa 10"]}
+              villas={["All Villas", "Sample Villa", "Khetan Villa", "Madan Villa", "Pandhari Villa", "Dormitory Villa", "Tidke Villa", "Ishan Villa", "Cottage Villa", "Krishna Villa", "Motvani Villa", "Bhatkar villa"]}
               bookedByDate={bookings.reduce((acc, b) => {
                 if (b.checkIn && b.checkOut) {
                   const start = new Date(b.checkIn);
                   const end = new Date(b.checkOut);
                   const current = new Date(start);
-                  while (current <= end) {
-                    const formatted = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2,"0")}-${String(current.getDate()).padStart(2,"0")}`;
+                  while (current < end) {   // ✔ FIXED
+                    const formatted =
+                      `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, "0")}-${String(current.getDate()).padStart(2, "0")}`;
                     if (!acc[formatted]) acc[formatted] = [];
                     acc[formatted].push(b.villa);
+
                     current.setDate(current.getDate() + 1);
                   }
                 }

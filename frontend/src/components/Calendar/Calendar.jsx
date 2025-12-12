@@ -8,15 +8,16 @@ const Calendar = ({
   villas = [
     "All Villas",
     "Sample Villa",
-    "Ishaan Villa",
     "Khetan Villa",
-    "Pandhari Villa",
-    "Patel Villa",
-    "More Villa",
     "Madan Villa",
-    "Villa 8",
-    "Villa 9",
-    "Villa 10"
+    "Pandhari Villa",
+    "Dormitory Villa",
+    "Tidke Villa",
+    "Ishan Villa",
+    "Cottage Villa",
+    "Krishna Villa",
+    "Motvani Villa",
+    "Bhatkar Villa",
   ],
 }) => {
 
@@ -47,6 +48,7 @@ const Calendar = ({
     "#EF537B", // complement of #10AC84
     "#0060BC", // complement of #FF9F43
     "#C4E068", // complement of #341F97
+    "#038316ff", // complement of #341F97
   ]
   villas.forEach((villa, i) => {
     villaColors[villa] = colorPalette[i % colorPalette.length];

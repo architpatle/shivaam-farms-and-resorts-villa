@@ -15,10 +15,12 @@ import Booking from "./pages/Booking.jsx";
 import Stocks from "./pages/Stocks.jsx";
 import CheckInForm from "./pages/CheckInForm.jsx";
 import Settings from "./pages/Settings.jsx";
+import CalendarPage from "./pages/CalendarPage.jsx";
 
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop.jsx";
 import Login from "./pages/Login.jsx";
 import Protected from "./Protected.jsx";
+import NotAllowed from "./pages/NotAllowed.jsx";
 
 
 // ⭐ Layout wrapper for hiding sidebar/navbar on login page
@@ -68,25 +70,22 @@ const App = () => {
               </Protected>
             }
           />
-
           <Route
             path="/staff"
             element={
-              <Protected>
+              <Protected allowedRoles={["admin"]}>
                 <Staff />
               </Protected>
             }
           />
-
           <Route
             path="/finance"
             element={
-              <Protected>
+              <Protected allowedRoles={["admin"]}>
                 <Finance />
               </Protected>
             }
           />
-
           <Route
             path="/booking"
             element={
@@ -95,16 +94,23 @@ const App = () => {
               </Protected>
             }
           />
-
           <Route
-            path="/stocks"
+            path="/calendar"
             element={
               <Protected>
-                <Stocks />
+                <CalendarPage />
               </Protected>
             }
           />
 
+          <Route
+            path="/stocks"
+            element={
+              <Protected allowedRoles={["admin"]}>
+                <Stocks />
+              </Protected>
+            }
+          />
           <Route
             path="/checkInForm"
             element={
@@ -119,6 +125,15 @@ const App = () => {
             element={
               <Protected>
                 <Settings />
+              </Protected>
+            }
+          />
+
+          <Route
+            path="/not-allowed"
+            element={
+              <Protected>
+                <NotAllowed />
               </Protected>
             }
           />

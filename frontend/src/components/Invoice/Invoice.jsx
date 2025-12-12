@@ -33,8 +33,8 @@ const Invoice = ({ booking, onClose }) => {
   const gstRows = getGSTRows();
 
   // ------------------------- PDF DOWNLOAD -------------------------
-  const handleDownload = () => {
-    const doc = new jsPDF("p", "mm", "a4");
+  const handleDownload = (doc = null, silent = false) => {
+    if (!doc) doc = new jsPDF("p", "mm", "a4");
     const pageWidth = doc.internal.pageSize.getWidth();
 
     /* ---------------- WATERMARK ---------------- */
@@ -87,17 +87,17 @@ const Invoice = ({ booking, onClose }) => {
     doc.setFillColor(212, 237, 218); // table-success color
     doc.rect(15, y, pageWidth - 30, 8, "F");
     doc.text("Description", 20, y + 6);
-    doc.text("Rate (₹)", 100, y + 6);
+    doc.text("Rate (Rs.)", 100, y + 6);
     doc.text("Qty", 140, y + 6);
-    doc.text("Subtotal (₹)", 165, y + 6);
+    doc.text("Subtotal (Rs.)", 165, y + 6);
 
     /* item row */
     y += 14;
     doc.setFont("helvetica", "normal");
     doc.text(booking.villa, 20, y);
-    doc.text(`${booking.base_amount}`, 105, y);
+    doc.text(`Rs. ${booking.base_amount}`, 105, y);;
     doc.text("1", 142, y);
-    doc.text(`${booking.base_amount}`, 170, y);
+    doc.text(`Rs. ${booking.base_amount}`, 170, y);
 
     /* ---------------- GST TABLE ---------------- */
     y += 15;
@@ -112,7 +112,7 @@ const Invoice = ({ booking, onClose }) => {
     doc.setFillColor(255, 245, 204); // table-warning color
     doc.rect(15, y, pageWidth - 30, 8, "F");
     doc.text("Tax Type", 20, y + 6);
-    doc.text("Amount (₹)", 165, y + 6);
+    doc.text("Amount (Rs.)", 165, y + 6);
 
     y += 14;
     doc.setFont("helvetica", "normal");
@@ -121,7 +121,7 @@ const Invoice = ({ booking, onClose }) => {
     const rows = getGSTRows();
     rows.forEach((r) => {
       doc.text(r.label, 20, y);
-      doc.text(`₹${Number(r.value).toFixed(2)}`, 170, y); // Added '₹' and toFixed(2)
+      doc.text(`Rs. ${Number(r.value).toFixed(2)}`, 170, y); // Added '₹' and toFixed(2)
       y += 8;
     });
 
@@ -130,7 +130,7 @@ const Invoice = ({ booking, onClose }) => {
     doc.setFillColor(220, 237, 247); // A light blue color for Grand Total row
     doc.rect(15, y, pageWidth - 30, 8, "F");
     doc.text("Grand Total", 20, y + 6);
-    doc.text(`₹${Number(booking.total_amount).toFixed(2)}`, 170, y + 6); // Use toFixed(2) for consistency
+    doc.text(`Rs. ${Number(booking.total_amount).toFixed(2)}`, 170, y + 6); // Use toFixed(2) for consistency
 
     /* ---------------- PAYMENT DETAILS ---------------- */
     y += 16;
@@ -140,7 +140,7 @@ const Invoice = ({ booking, onClose }) => {
     doc.text(`Received By: ${booking.received_by}`, 15, y);
     // Removed Remaining amount line as it is not in the image.
     // y += 6;
-    // doc.text(`Remaining: ₹ ${booking.remaining_amount}`, 15, y); 
+    // doc.text(`Remaining: Rs. ${booking.remaining_amount}`, 15, y); 
 
     /* ---------------- TERMS ---------------- */
     y += 12;
@@ -162,9 +162,52 @@ const Invoice = ({ booking, onClose }) => {
     doc.text("Thank you for visiting!", pageWidth / 2, 290, { align: "center" });
 
     /* SAVE */
-    doc.save(`Invoice_${booking.guest}_${booking.villa}.pdf`);
+    if (!silent) {
+      doc.save(`Invoice_${booking.guest}_${booking.villa}.pdf`);
+    }
+    return doc;
+
   };
 
+  // ------------------------- SHARE VIA WHATSAPP -------------------------
+  const handleShareWhatsApp = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/booking/send-invoice/${booking.id}`,
+        { method: "POST" }
+      );
+
+      const data = await res.json();
+
+      if (!data.publicUrl) {
+        alert("Failed to generate invoice PDF!");
+        return;
+      }
+
+      const message = `
+🧾 *Booking Invoice*
+━━━━━━━━━━━━━━
+👤 *Guest:* ${booking.guest}
+🏡 *Villa:* ${booking.villa}
+📅 *Check-in:* ${new Date(booking.checkIn).toLocaleDateString()}
+📅 *Check-out:* ${new Date(booking.checkOut).toLocaleDateString()}
+💰 *Amount:* Rs. ${booking.total_amount}
+
+📎 *Download Invoice (PDF):* ${data.publicUrl}
+
+Thank you for booking with Shivaam Farms & Resorts 🌿
+`.trim();
+
+      const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+        message
+      )}`;
+
+      window.open(whatsappUrl, "_blank");
+    } catch (err) {
+      console.error(err);
+      alert("Error sharing invoice.");
+    }
+  };
 
 
   return (
@@ -250,15 +293,44 @@ const Invoice = ({ booking, onClose }) => {
         {/* TERMS */}
         <div className="mt-4 small">
           <p className="fw-bold">Terms and Conditions:</p>
-          <p>For security, 5 member Aadhar cards are required during check-in. They will be returned during check-out.</p>
+
+          {/* <p>For security, 5 member Aadhar cards are required during check-in. They will be returned during check-out.</p> */}
+
+          <p>Check-in time is 1:00 PM and check-out time is 11:00 AM. Early check-in or late check-out is subject to availability and may incur additional charges.</p>
+
+          <p>Guests are responsible for any damage caused to villa property, furniture, fixtures, or electrical appliances during their stay.</p>
+
+          <p>Outside food delivery is strictly prohibited unless written permission is granted by management.</p>
+
+          <p>Loud music is not allowed after 10:00 PM as per local regulations. Guests must maintain decorum and avoid disturbing other residents.</p>
+
+          <p>Pool usage is at the guest’s own risk. Children must be accompanied by adults at all times.</p>
+
+          <p>Reservation is confirmed only upon full or partial payment. Amount once paid is non-refundable but may be rescheduled based on availability.</p>
+
+          <p>Management is not responsible for loss of personal belongings, valuables, or unattended items.</p>
         </div>
+
 
         {/* DOWNLOAD BUTTON */}
         <div className="text-center mt-4">
-          <button className="btn btn-success" onClick={handleDownload}>
+          <button
+            className="btn btn-success"
+            onClick={() => {
+              console.log("DOWNLOAD BUTTON CLICKED");
+              handleDownload();
+            }}
+          >
             ⬇️ Download Invoice
           </button>
+
         </div>
+        <div className="text-center mt-2">
+          <button className="btn btn-primary" onClick={handleShareWhatsApp}>
+            📤 Share via WhatsApp
+          </button>
+        </div>
+
       </div>
     </div>
   );

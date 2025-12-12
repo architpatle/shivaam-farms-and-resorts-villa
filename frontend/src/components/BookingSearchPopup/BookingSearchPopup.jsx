@@ -25,12 +25,14 @@ const getVillaColor = (villa) => {
 };
 
 const BookingSearchPopup = ({ onClose, onSelect }) => {
+  const role = localStorage.getItem("role");
+  const isExecutive = role === "executive";
   const [bookings, setBookings] = useState([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-useEffect(() => {
+  useEffect(() => {
     const fetchBookings = async () => {
       try {
         setLoading(true);
@@ -52,7 +54,7 @@ useEffect(() => {
   const filtered = bookings.filter(
     (b) =>
       b.guest?.toLowerCase().includes(query.toLowerCase()) ||
-      b.email?.toLowerCase().includes(query.toLowerCase()) ||
+      // b.email?.toLowerCase().includes(query.toLowerCase()) ||
       b.villa?.toLowerCase().includes(query.toLowerCase()) ||
       b.phone?.toLowerCase().includes(query.toLowerCase())
   );
@@ -95,7 +97,7 @@ useEffect(() => {
         <input
           type="text"
           className="form-control mb-3"
-          placeholder="Search by guest, villa, email, or phone..."
+          placeholder="Search by guest, villa or phone..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           autoFocus
@@ -133,14 +135,19 @@ useEffect(() => {
                   {formatDate(b.check_in || b.checkIn)} →{" "}
                   {formatDate(b.check_out || b.checkOut)}
                 </div>
-                <div className="small mb-1">
+                {/* <div className="small mb-1">
                   {b.email} |  {b.phone} |  Guests: {b.guests || 1}
-                </div>
+                </div> */}
+                {/* Hide financial data for EXECUTIVE */}
 
-                <div className="small mb-1"> Payment: {b.payment_mode || "-"}</div>
-                <div className="small mb-1"> Advance: ₹{b.advanced_amount || 0}</div>
-                <div className="small mb-1"> Balance: ₹{b.remaining_amount || 0}</div>
-                <div className="fw-bold">Total: ₹{b.total_amount || 0}</div>
+                {!isExecutive && (
+                  <>
+                    <div className="small mb-1"> Payment: {b.payment_mode || "-"}</div>
+                    <div className="small mb-1"> Advance: ₹{b.advanced_amount || 0}</div>
+                    <div className="small mb-1"> Balance: ₹{b.remaining_amount || 0}</div>
+                    <div className="fw-bold">Total: ₹{b.total_amount || 0}</div>
+                  </>
+                )}
 
                 {b.status && (
                   <div className="badge bg-secondary mt-2">{b.status}</div>

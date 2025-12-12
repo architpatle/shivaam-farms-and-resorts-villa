@@ -5,10 +5,10 @@ import "./NewBooking.css";
 const NewBooking = ({ onClose, onSave }) => {
   const [formData, setFormData] = useState({
     guest: "",
-    email: "",
+    // email: "",
     phone: "",
     address: "",
-    aadhar: "",
+    // aadhar: "",
     villa: "Sample Villa",
     checkIn: "",
     checkOut: "",
@@ -29,23 +29,24 @@ const NewBooking = ({ onClose, onSave }) => {
   const villaOptions = [
   "All Villas",
   "Sample Villa",
-  "Ishaan Villa",
   "Khetan Villa",
-  "Pandhari Villa",
-  "Patel Villa",
-  "More Villa",
   "Madan Villa",
-  "Villa 8",
-  "Villa 9",
-  "Villa 10"
+  "Pandhari Villa",
+  "Dormitory Villa",
+  "Tidke Villa",
+  "Ishan Villa",
+  "Cottage Villa",
+  "Krishna Villa",
+  "Motvani Villa",
+  "Bhatkar villa"
 ];
 
   const [dateError, setDateError] = useState("");
 
-  const normalizeAadharInput = (val) => {
-    let digits = String(val).replace(/\D/g, "").slice(0, 12);
-    return digits.replace(/(\d{4})(?=\d)/g, "$1 ");
-  };
+  // const normalizeAadharInput = (val) => {
+  //   let digits = String(val).replace(/\D/g, "").slice(0, 12);
+  //   return digits.replace(/(\d{4})(?=\d)/g, "$1 ");
+  // };
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -108,10 +109,10 @@ const NewBooking = ({ onClose, onSave }) => {
   };
 
   // aadhar special handler
-  const handleAadharChange = (e) => {
-    const formatted = normalizeAadharInput(e.target.value);
-    setFormData((prev) => ({ ...prev, aadhar: formatted }));
-  };
+  // const handleAadharChange = (e) => {
+  //   const formatted = normalizeAadharInput(e.target.value);
+  //   setFormData((prev) => ({ ...prev, aadhar: formatted }));
+  // };
 
   // Recompute total when baseAmount or gstType changes
   useEffect(() => {
@@ -138,9 +139,9 @@ const NewBooking = ({ onClose, onSave }) => {
     e.preventDefault();
 
     if (!formData.guest.trim()) return alert("Enter guest");
-    if (!formData.email.trim()) return alert("Enter email");
-    if (!formData.aadhar || formData.aadhar.replace(/\s/g, "").length !== 12)
-      return alert("Enter 12-digit Aadhar");
+    // if (!formData.email.trim()) return alert("Enter email");
+    // if (!formData.aadhar || formData.aadhar.replace(/\s/g, "").length !== 12)
+    //   return alert("Enter 12-digit Aadhar");
     if (!formData.checkIn || !formData.checkOut) return alert("Select dates");
     if (formData.nights <= 0) return alert("Invalid dates");
     if (!formData.baseAmount || Number(formData.baseAmount) <= 0)
@@ -151,10 +152,10 @@ const NewBooking = ({ onClose, onSave }) => {
 
     const payload = {
       guest: formData.guest.trim(),
-      email: formData.email.trim(),
+      // email: formData.email.trim(),
       phone: formData.phone?.trim() || null,
       address: formData.address?.trim() || null,
-      aadhar: formData.aadhar.replace(/\s/g, ""),
+      // aadhar: formData.aadhar.replace(/\s/g, ""),
       villa: formData.villa,
       checkIn: formData.checkIn,
       checkOut: formData.checkOut,
@@ -237,10 +238,10 @@ const NewBooking = ({ onClose, onSave }) => {
 
             </div>
 
-            <div className="col-12 col-sm-6">
+            {/* <div className="col-12 col-sm-6">
               <label>Email</label>
               <input name="email" type="email" value={formData.email} onChange={handleChange} className="form-control" />
-            </div>
+            </div> */}
 
             <div className="col-12 col-sm-6">
               <label>Phone</label>
@@ -252,13 +253,13 @@ const NewBooking = ({ onClose, onSave }) => {
               <textarea name="address" value={formData.address} onChange={handleChange} className="form-control" rows="2" />
             </div>
 
-            <div className="col-12 col-sm-6">
+            {/* <div className="col-12 col-sm-6">
               <label>Aadhar</label>
               <input name="aadhar" value={formData.aadhar} onChange={handleAadharChange} className="form-control" maxLength={14} />
               {formData.aadhar && formData.aadhar.replace(/\s/g, "").length !== 12 && (
                 <small className="text-danger">Aadhar must be 12 digits</small>
               )}
-            </div>
+            </div> */}
 
             <div className="col-12 col-sm-6">
               <label>Check-in</label>

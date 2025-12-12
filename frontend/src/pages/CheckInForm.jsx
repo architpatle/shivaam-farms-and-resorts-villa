@@ -25,6 +25,8 @@ const CheckInForm = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [allBookings, setAllBookings] = useState([]);
+  const role = localStorage.getItem("role");
+  const isExecutive = role === "executive";
 
   // 🔹 Fetch existing check-ins from backend on component mount
   useEffect(() => {
@@ -384,6 +386,7 @@ const CheckInForm = () => {
               />
             </div>
           </div>
+
           <div className="row mb-3">
             <div className="col">
               <label className="form-label">Payment Mode</label>
@@ -485,10 +488,10 @@ const CheckInForm = () => {
                 <th>Guests</th>
                 <th>Check-in</th>
                 <th>Check-out</th>
-                <th>Payment Mode</th>
-                <th>Advance</th>
-                <th>Balance</th>
-                <th>Total</th>
+                {!isExecutive && <th>Payment Mode</th>}
+                {!isExecutive && <th>Advance</th>}
+                {!isExecutive && <th>Balance</th>}
+                {!isExecutive && <th>Total</th>}
               </tr>
             </thead>
             <tbody>
@@ -508,10 +511,10 @@ const CheckInForm = () => {
                     <td>{res.guests}</td>
                     <td>{res.checkIn || ""} {res.checkInTime || ""}</td>
                     <td>{res.checkOut || ""} {res.checkOutTime || ""}</td>
-                    <td>{res.paymentMode}</td>
-                    <td>{res.advance}</td>
-                    <td>{res.balance}</td>
-                    <td>{res.total}</td>
+                    {!isExecutive && <td>{res.paymentMode}</td>}
+                    {!isExecutive && <td>{res.advance}</td>}
+                    {!isExecutive && <td>{res.balance}</td>}
+                    {!isExecutive && <td>{res.total}</td>}
                   </tr>
                 ))
               )}

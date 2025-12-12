@@ -7,14 +7,12 @@ import { MdCurrencyRupee } from "react-icons/md";
 import { GoPeople } from "react-icons/go";
 import { LuBox } from "react-icons/lu";
 import { getStaff } from "../service/staffApi";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
+import CheckAvailability from "../components/CheckAvailability/CheckAvailability";
 
 const Dashboard = () => {
   // === States ===
-
-   const navigate = useNavigate();
-
-   
+  // const navigate = useNavigate();
   const [staffCount, setStaffCount] = useState(0);
   const [totalBookings, setTotalBookings] = useState(0);
   const [totalRevenue, setTotalRevenue] = useState(0);
@@ -22,11 +20,14 @@ const Dashboard = () => {
   const [lowStockItems, setLowStockItems] = useState([]);
   const [showLowStockModal, setShowLowStockModal] = useState(false);
 
-   // ✅ Logout Function
-  const handleLogout = () => {
-    localStorage.removeItem("loggedIn");
-    navigate("/login");
-  };
+  const role = localStorage.getItem("role");
+  const isExecutive = role === "executive";
+
+  // ✅ Logout Function
+  // const handleLogout = () => {
+  //   localStorage.removeItem("loggedIn");
+  //   navigate("/login");
+  // };
 
   // === Fetch Staff Count ===
   useEffect(() => {
@@ -50,9 +51,9 @@ const Dashboard = () => {
         setTotalBookings(data.length || 0);
 
         const totalRev = data.reduce(
-  (sum, item) => sum + (Number(item.customer_payment) || 0),
-  0
-);
+          (sum, item) => sum + (Number(item.customer_payment) || 0),
+          0
+        );
 
         setTotalRevenue(totalRev);
       } catch (err) {
@@ -122,14 +123,18 @@ const Dashboard = () => {
   // === Render ===
   return (
     <div className="overviewContainer container">
-        {/* ✅ LOGOUT BUTTON (Top Right) */}
-      <div className="d-flex justify-content-end mt-3">
+      {/* ✅ LOGOUT BUTTON (Top Right) */}
+      {/* <div className="d-flex justify-content-end mt-3">
         <button
           className="btn btn-danger px-4 py-2"
           onClick={handleLogout}
         >
           Logout
         </button>
+      </div> */}
+      <div className="py-3">
+        <h2 className="fs-4 fw-500">Check Availability</h2>
+        <CheckAvailability />
       </div>
       <div className="py-4">
         {/* --- Quick Actions --- */}
@@ -156,34 +161,43 @@ const Dashboard = () => {
         </div>
 
         {/* --- Overview --- */}
-        <div className="row g-3 justify-content-center pb-4">
+        <div
+          className={`row g-3 pb-4 ${isExecutive ? "justify-content-start" : "justify-content-center"
+            }`}
+        >
           <h2 className="fs-4 fw-500">Overview</h2>
 
+          {/* Always visible */}
           <Card
             cardTitle={"Total Bookings"}
             cardIcon={<CiCalendar fontSize={20} color="#000000" />}
             cardSubtitle={totalBookings.toString()}
           />
 
-          <Card
-            cardTitle={"Total Revenue"}
-            cardIcon={<MdCurrencyRupee fontSize={20} color="#000000" />}
-            cardSubtitle={`₹${totalRevenue.toLocaleString()}`}
-          />
+          {/* Hide these 3 cards for EXECUTIVE */}
+          {!isExecutive && (
+            <>
+              <Card
+                cardTitle={"Total Revenue"}
+                cardIcon={<MdCurrencyRupee fontSize={20} color="#000000" />}
+                cardSubtitle={`₹${totalRevenue.toLocaleString()}`}
+              />
 
-          <Card
-            cardTitle={"Total Staff"}
-            cardIcon={<GoPeople fontSize={20} color="#000000" />}
-            cardSubtitle={staffCount.toString()}
-          />
+              <Card
+                cardTitle={"Total Staff"}
+                cardIcon={<GoPeople fontSize={20} color="#000000" />}
+                cardSubtitle={staffCount.toString()}
+              />
 
-          <Card
-            cardTitle={"Stock Status"}
-            cardIcon={<LuBox fontSize={20} color="#000000" />}
-            cardSubtitle={stockHealth}
-            style={{ cursor: "pointer" }}
-            onClick={handleLowStockClick}
-          />
+              <Card
+                cardTitle={"Stock Status"}
+                cardIcon={<LuBox fontSize={20} color="#000000" />}
+                cardSubtitle={stockHealth}
+                style={{ cursor: "pointer" }}
+                onClick={handleLowStockClick}
+              />
+            </>
+          )}
         </div>
 
         {/* --- Low Stock Modal --- */}

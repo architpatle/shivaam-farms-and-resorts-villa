@@ -10,6 +10,7 @@ import bookingRoutes from "./routes/bookingRoutes.js";
 import revenueRoutes from "./routes/revenue.js";
 import expenseRoutes from "./routes/expense.js";
 import checkinRoutes from "./routes/checkinRoutes.js";
+import bookingInvoiceRoutes from "./routes/bookingInvoiceRoutes.js";
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.get("/", (req, res) => {
 app.use("/staff", staffRoutes);
 app.use("/api/stocks", stockRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api", bookingInvoiceRoutes);
 app.use("/api/checkins", checkinRoutes);
 
 // ✅ IMPORTANT — pass supabase client to these route functions

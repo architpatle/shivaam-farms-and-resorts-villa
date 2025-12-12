@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./login.css";
-import logo from "../assets/images/shivaam-farms-and-resorts.png";  // logo import
+import logo from "../assets/images/shivaam-farms-and-resorts.png";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -11,24 +11,41 @@ export default function Login() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    const USER = "admin";
-    const PASS = "12345";
 
-    if (username === USER && password === PASS) {
+    // ---- ADMIN ----
+    if (username === "admin" && password === "12345") {
       localStorage.setItem("loggedIn", "true");
-      navigate("/");
-    } else {
-      setError("Invalid username or password");
+      localStorage.setItem("role", "admin");   // ⭐ IMPORTANT
+      navigate("/");                  // main page
+      return;
     }
+
+    // ---- STAFF ----
+    if (username === "staff" && password === "12345") {
+      localStorage.setItem("loggedIn", "true");
+      localStorage.setItem("role", "staff");   // ⭐ IMPORTANT
+      navigate("/");
+      return;
+    }
+
+    // ---- EXECUTIVE ----
+    if (username === "executive" && password === "12345") {
+      localStorage.setItem("loggedIn", "true");
+      localStorage.setItem("role", "executive");
+      // ⭐ EXECUTIVE gets STAFF permissions
+      navigate("/");
+      return;
+    }
+
+
+    // ---- ELSE ----
+    setError("Invalid username or password");
   };
 
   return (
     <div className="login-wrapper">
       <div className="login-card shadow-lg">
-
-        {/* 🔥 Logo here */}
-        <img src={logo}  alt="Shivaam Logo" className="login-logo" />
-
+        <img src={logo} alt="Shivaam Logo" className="login-logo" />
         <h2 className="login-title">Villa Login</h2>
 
         {error && <p className="error-text">{error}</p>}
