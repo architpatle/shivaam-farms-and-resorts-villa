@@ -28,11 +28,12 @@ export const sendBookingInvoiceToWhatsApp = async (req, res) => {
 
     console.log("🚀 Launching Puppeteer...");
     const browser = await puppeteer.launch({
-      executablePath:
-        "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-      headless: true,
-      args: ["--no-sandbox"],
-    });
+  args: chromium.args,
+  defaultViewport: chromium.defaultViewport,
+  executablePath: await chromium.executablePath(),
+  headless: chromium.headless,
+});
+
 
     const page = await browser.newPage();
     await page.setContent(html, {
