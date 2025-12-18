@@ -73,8 +73,8 @@ const Invoice = ({ booking, onClose }) => {
     doc.setFont("helvetica", "normal");
     y += 7;
     doc.text(`Guest: ${booking.guest}`, 15, y);
-    y += 6;
-    doc.text(`Email: ${booking.email}`, 15, y);
+    // y += 6;
+    // doc.text(`Email: ${booking.email}`, 15, y);
     y += 6;
     doc.text(`Phone: ${booking.phone || "-"}`, 15, y);
     y += 6;
@@ -254,14 +254,15 @@ Thank you for booking with Shivaam Farms & Resorts 🌿
           {company.name}
         </h5>
         <p className="text-center small text-muted mb-3">
-          {company.address} | {company.phone} | {company.email}
+          {company.address} | {company.phone} | 
+          {/* {company.email} */}
         </p>
 
         {/* GUEST + BOOKING DETAILS */}
         <div className="row mb-3">
           <div className="col-md-6">
             <p><strong>Guest:</strong> {booking.guest}</p>
-            <p><strong>Email:</strong> {booking.email}</p>
+            {/* <p><strong>Email:</strong> {booking.email}</p> */}
             <p><strong>Phone:</strong> {booking.phone || "-"}</p>
             <p><strong>Villa:</strong> {booking.villa}</p>
           </div>

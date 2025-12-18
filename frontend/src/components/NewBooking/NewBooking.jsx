@@ -370,7 +370,7 @@ const NewBooking = ({ onClose, onSave }) => {
             </div>
 
             <div className="d-flex align-items-center gap-2">
-              <div className="btn-group btn-group-sm">
+              {/* <div className="btn-group btn-group-sm">
                 <button
                   type="button"
                   className={`btn ${bookingMode === "single" ? "btn-success" : "btn-outline-success"}`}
@@ -385,7 +385,7 @@ const NewBooking = ({ onClose, onSave }) => {
                 >
                   Bulk
                 </button>
-              </div>
+              </div> */}
 
               <button className="btn-close" onClick={onClose} />
             </div>
