@@ -11,6 +11,7 @@ export const sendBookingInvoiceToWhatsApp = async (req, res) => {
     const { bookingId } = req.params;
     console.log("📌 bookingId:", bookingId);
 
+    // 1️⃣ Fetch booking
     const result = await getBookingById(Number(bookingId));
     console.log("📦 getBookingById result:", result);
 
@@ -23,22 +24,34 @@ export const sendBookingInvoiceToWhatsApp = async (req, res) => {
 
     console.log("✅ Booking fetched");
 
+    // 2️⃣ Generate invoice HTML
     const html = generateBookingInvoiceHTML(booking);
     console.log("🧾 HTML generated");
 
+    // 3️⃣ Launch Puppeteer (Local vs Render)
     console.log("🚀 Launching Puppeteer...");
-    const executablePath =
-      process.env.NODE_ENV === "production"
-        ? await chromium.executablePath()
-        : undefined;
 
-    const browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath,
-      headless: chromium.headless,
-    });
+    let browser;
 
+    if (process.env.RENDER) {
+      // ✅ Render (Linux)
+      browser = await puppeteer.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+      });
+    } else {
+      // ✅ Local (Windows / Mac)
+      browser = await puppeteer.launch({
+        headless: true,
+        executablePath:
+          "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+        args: ["--no-sandbox"],
+      });
+    }
+
+    // 4️⃣ Render PDF
     const page = await browser.newPage();
 
     await page.setContent(html, {
@@ -54,6 +67,7 @@ export const sendBookingInvoiceToWhatsApp = async (req, res) => {
     await browser.close();
     console.log("📄 PDF generated");
 
+    // 5️⃣ Upload to Supabase
     const fileName = `booking_invoice_${bookingId}_${Date.now()}.pdf`;
     console.log("📝 Uploading:", fileName);
 
@@ -66,16 +80,22 @@ export const sendBookingInvoiceToWhatsApp = async (req, res) => {
 
     if (uploadError) {
       console.error("❌ Upload failed:", uploadError);
-      return res.status(500).json({ error: "Upload failed" });
+      return res.status(500).json({ error: uploadError.message });
     }
 
-    const { data } = supabase.storage.from("invoices").getPublicUrl(fileName);
+    // 6️⃣ Get public URL
+    const { data } = supabase.storage
+      .from("invoices")
+      .getPublicUrl(fileName);
 
     console.log("✅ Public URL:", data.publicUrl);
 
+    // 7️⃣ Send response
     res.json({ publicUrl: data.publicUrl });
   } catch (err) {
     console.error("🔥 BOOKING INVOICE ERROR:", err);
-    res.status(500).json({ error: "Failed to generate invoice" });
+    res.status(500).json({
+      error: err.message || "Failed to generate invoice",
+    });
   }
 };
