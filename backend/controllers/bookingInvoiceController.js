@@ -6,6 +6,13 @@ import { generateBookingInvoiceHTML } from "../Template/generateBookingInvoiceHT
 
 export const sendBookingInvoiceToWhatsApp = async (req, res) => {
   console.log("🔥 sendBookingInvoiceToWhatsApp HIT");
+  const bookingId = Number(req.params.bookingId);
+
+  if (!bookingId || isNaN(bookingId)) {
+    return res.status(400).json({
+      error: "Invalid bookingId",
+    });
+  }
 
   try {
     const { bookingId } = req.params;
@@ -84,9 +91,7 @@ export const sendBookingInvoiceToWhatsApp = async (req, res) => {
     }
 
     // 6️⃣ Get public URL
-    const { data } = supabase.storage
-      .from("invoices")
-      .getPublicUrl(fileName);
+    const { data } = supabase.storage.from("invoices").getPublicUrl(fileName);
 
     console.log("✅ Public URL:", data.publicUrl);
 
