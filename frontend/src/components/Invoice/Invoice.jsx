@@ -183,50 +183,42 @@ const Invoice = ({ booking, onClose }) => {
 
   // ------------------------- SHARE VIA WHATSAPP -------------------------
   const handleShareWhatsApp = async () => {
-  try {
-    if (!booking?.phone) {
-      alert("No phone number found for this booking");
-      return;
-    }
-
-    const phone = booking.phone.replace(/\D/g, "");
-    if (phone.length < 10) {
-      alert("Invalid phone number");
-      return;
-    }
-
-    const API_BASE_URL =
-      import.meta.env.MODE === "development"
-        ? ""
-        : import.meta.env.VITE_API_BASE_URL;
-
-    if (import.meta.env.MODE !== "development" && !API_BASE_URL) {
-      throw new Error("Backend URL is not configured");
-    }
-
-    const res = await fetch(
-      `${API_BASE_URL}/api/booking/send-invoice/${booking.id}`,
-      { method: "POST" }
-    );
-
-    let data = null;
     try {
-      data = await res.json();
-    } catch {}
+      if (!booking?.phone) {
+        alert("No phone number found for this booking");
+        return;
+      }
 
-    if (!res.ok) {
-      throw new Error(data?.error || "Backend error");
-    }
+      const phone = booking.phone.replace(/\D/g, "");
+      if (phone.length < 10) {
+        alert("Invalid phone number");
+        return;
+      }
 
-    const { publicUrl } = data || {};
-    if (!publicUrl) {
-      throw new Error("Invoice link not received");
-    }
+      // ✅ Auto-detect backend URL
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
-    const formatDate = (d) =>
-      new Date(d).toLocaleDateString("en-IN");
+      const res = await fetch(
+        `${API_BASE_URL}/api/booking/send-invoice/${booking.id}`,
+        { method: "POST" }
+      );
 
-    const message = `
+      let data = null;
+      try {
+        data = await res.json();
+      } catch {}
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Backend error");
+      }
+
+      if (!data?.publicUrl) {
+        throw new Error("Invoice link not received");
+      }
+
+      const formatDate = (d) => new Date(d).toLocaleDateString("en-IN");
+
+      const message = `
 🧾 Booking Invoice
 ━━━━━━━━━━━━━━
 👤 Guest: ${booking.guest}
@@ -236,21 +228,20 @@ const Invoice = ({ booking, onClose }) => {
 💰 Amount: ₹${Number(booking.total_amount).toFixed(2)}
 
 📎 Download Invoice:
-${publicUrl}
+${data.publicUrl}
 
 Thank you for booking with Shivaam Farms & Resorts 🌿
 `.trim();
 
-    window.open(
-      `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
-      "_blank"
-    );
-  } catch (err) {
-    console.error("WhatsApp share failed:", err);
-    alert(err.message || "Error sharing invoice on WhatsApp");
-  }
-};
-
+      window.open(
+        `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
+        "_blank"
+      );
+    } catch (err) {
+      console.error("WhatsApp share failed:", err);
+      alert(err.message || "Error sharing invoice on WhatsApp");
+    }
+  };
 
   return (
     <div className="invoice-overlay">
