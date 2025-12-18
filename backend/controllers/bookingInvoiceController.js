@@ -1,45 +1,78 @@
 import { supabase } from "../config/supabaseClient.js";
+import chromium from "@sparticuz/chromium";
+import puppeteer from "puppeteer-core";
 import { getBookingById } from "../models/bookingModel.js";
-import { generateBookingInvoicePDF } from "../utils/generateBookingInvoice.js";
+import { generateBookingInvoiceHTML } from "../Template/generateBookingInvoiceHTML.js";
 
 export const sendBookingInvoiceToWhatsApp = async (req, res) => {
+  console.log("🔥 sendBookingInvoiceToWhatsApp HIT");
+
   try {
     const { bookingId } = req.params;
+    console.log("📌 bookingId:", bookingId);
 
-    // 1️⃣ Fetch booking data
-    const { data: booking, error } = await getBookingById(Number(bookingId));
-    if (error) throw error;
-    if (!booking) return res.status(404).json({ error: "Booking not found" });
+    const result = await getBookingById(Number(bookingId));
+    console.log("📦 getBookingById result:", result);
 
-    // 2️⃣ Generate PDF bytes
-    const pdfBytes = await generateBookingInvoicePDF(booking);
-    const fileBuffer = Buffer.from(pdfBytes);
+    const { data: booking, error } = result;
 
-    // 3️⃣ Upload to Supabase (CORRECTED)
+    if (error || !booking) {
+      console.error("❌ Booking fetch failed:", error);
+      return res.status(404).json({ error: "Booking not found" });
+    }
+
+    console.log("✅ Booking fetched");
+
+    const html = generateBookingInvoiceHTML(booking);
+    console.log("🧾 HTML generated");
+
+    console.log("🚀 Launching Puppeteer...");
+    const browser = await puppeteer.launch({
+      executablePath:
+        "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      headless: true,
+      args: ["--no-sandbox"],
+    });
+
+    const page = await browser.newPage();
+    await page.setContent(html, {
+      waitUntil: "domcontentloaded",
+    });
+
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true,
+    });
+
+    await browser.close();
+    console.log("📄 PDF generated");
+
     const fileName = `booking_invoice_${bookingId}_${Date.now()}.pdf`;
+    console.log("📝 Uploading:", fileName);
 
     const { error: uploadError } = await supabase.storage
-      .from("invoices")        // bucket name ONLY
-      .upload(fileName, fileBuffer, {
+      .from("invoices")
+      .upload(fileName, pdfBuffer, {
         contentType: "application/pdf",
         upsert: true,
       });
 
     if (uploadError) {
-      return res.status(500).json({ error: uploadError.message });
+      console.error("❌ Upload failed:", uploadError);
+      return res.status(500).json({ error: "Upload failed" });
     }
 
-    // 4️⃣ Get public URL (CORRECTED)
-    const { data: publicData } = supabase.storage
+    const { data } = supabase.storage
       .from("invoices")
       .getPublicUrl(fileName);
 
-    console.log("✅ Invoice uploaded:", publicData.publicUrl);
+    console.log("✅ Public URL:", data.publicUrl);
 
-    res.json({ publicUrl: publicData.publicUrl });
+    res.json({ publicUrl: data.publicUrl });
 
   } catch (err) {
-    console.error("❌ sendBookingInvoiceToWhatsApp error:", err);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("🔥 BOOKING INVOICE ERROR:", err);
+    res.status(500).json({ error: "Failed to generate invoice" });
   }
 };
+

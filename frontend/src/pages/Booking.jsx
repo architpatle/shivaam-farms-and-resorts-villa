@@ -77,23 +77,23 @@ const Booking = () => {
     : 0;
 
   // Mock previous month data
-  const prevMonthBookings = 10;
-  const prevMonthGuests = 20;
-  const prevMonthOccupancy = 50;
+  // const prevMonthBookings = 10;
+  // const prevMonthGuests = 20;
+  // const prevMonthOccupancy = 50;
 
   // Growth % calculations
-  const bookingGrowth =
-    prevMonthBookings > 0
-      ? (((totalBookings - prevMonthBookings) / prevMonthBookings) * 100).toFixed(1)
-      : "0";
-  const guestGrowth =
-    prevMonthGuests > 0
-      ? (((currentGuests - prevMonthGuests) / prevMonthGuests) * 100).toFixed(1)
-      : "0";
-  const occupancyGrowth =
-    prevMonthOccupancy > 0
-      ? (((occupancyRate - prevMonthOccupancy) / prevMonthOccupancy) * 100).toFixed(1)
-      : "0";
+  // const bookingGrowth =
+  //   prevMonthBookings > 0
+  //     ? (((totalBookings - prevMonthBookings) / prevMonthBookings) * 100).toFixed(1)
+  //     : "0";
+  // const guestGrowth =
+  //   prevMonthGuests > 0
+  //     ? (((currentGuests - prevMonthGuests) / prevMonthGuests) * 100).toFixed(1)
+  //     : "0";
+  // const occupancyGrowth =
+  //   prevMonthOccupancy > 0
+  //     ? (((occupancyRate - prevMonthOccupancy) / prevMonthOccupancy) * 100).toFixed(1)
+  //     : "0";
 
   const fetchBookings = async () => {
     try {
@@ -146,7 +146,7 @@ const Booking = () => {
       const res = await fetch(`https://shivaam-farms-and-resorts-villa.onrender.com/api/bookings/${id}`, {
         method: "DELETE",
       });
-      const data = await res.json();
+      // const data = await res.json();
 
       if (res.ok) {
         setBookings(bookings.filter((b) => b.id !== id));
@@ -173,7 +173,7 @@ const Booking = () => {
           body: JSON.stringify(updatedBooking),
         }
       );
-      const result = await response.json();
+      // const result = await response.json();
       if (response.ok) await fetchBookings();
     } catch (error) {
       console.error("Update failed:", error);
@@ -283,9 +283,9 @@ const Booking = () => {
                       <th>Dates</th>
                       <th>Guests</th>
                       <th>Status</th>
+                      <th>Received By</th>
                       {!isExecutive && (
                         <>
-                          <th>Received By</th>
                           <th>Base Amount (₹)</th>
                           <th>GST Type</th>
                           <th>CGST (₹)</th>
@@ -340,9 +340,9 @@ const Booking = () => {
                             {b.payment_category === "Total" || Number(b.remaining_amount) === 0 ? "Confirmed" : b.status}
                           </span>
                         </td>
+                        <td>{b.received_by || "-"}</td>
                         {!isExecutive && (
                           <>
-                            <td>{b.received_by || "-"}</td>
                             <td>₹ {b.base_amount}</td>
                             <td>{b.gst_type}</td>
                             <td>₹ {b.cgst_amount}</td>

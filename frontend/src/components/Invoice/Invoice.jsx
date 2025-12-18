@@ -149,12 +149,18 @@ const Invoice = ({ booking, onClose }) => {
 
     doc.setFont("helvetica", "normal");
     y += 6;
-    doc.text(
-      "For security, 5 member Aadhar cards are required during check-in. They will be returned during check-out.",
-      15,
-      y,
-      { maxWidth: 180 }
-    );
+    const terms = [
+      // "For security, 5 member Aadhar cards are required during check-in. They will be returned during check-out.",
+      "1. Check-in time is 1:00 PM and check-out time is 11:00 AM. Early check-in or late check-out is subject to availability and may incur additional charges.",
+      "2. Guests are responsible for any damage caused to villa property, furniture, fixtures, or electrical appliances during their stay.",
+      "3. Outside food delivery is strictly prohibited unless written permission is granted by management.",
+      "4. Loud music is not allowed after 10:00 PM as per local regulations. Guests must maintain decorum and avoid disturbing other residents.",
+      "5. Pool usage is at the guest’s own risk. Children must be accompanied by adults at all times.",
+      "6. Management is not responsible for loss of personal belongings, valuables, or unattended items."
+    ];
+
+    doc.text(terms, 15, y, { maxWidth: 180 });
+
 
     /* ---------------- FOOTER ---------------- */
     doc.setFont("helvetica", "bold");
@@ -170,45 +176,70 @@ const Invoice = ({ booking, onClose }) => {
   };
 
   // ------------------------- SHARE VIA WHATSAPP -------------------------
-  const handleShareWhatsApp = async () => {
-    try {
-      const res = await fetch(
-        `http://localhost:5000/api/booking/send-invoice/${booking.id}`,
-        { method: "POST" }
-      );
+const handleShareWhatsApp = async () => {
+  try {
+    // 1️⃣ Validate phone number
+    if (!booking.phone) {
+      alert("No phone number found for this booking");
+      return;
+    }
 
-      const data = await res.json();
+    // WhatsApp requires digits only + country code
+    const phone = booking.phone.replace(/\D/g, "");
 
-      if (!data.publicUrl) {
-        alert("Failed to generate invoice PDF!");
-        return;
-      }
+    if (phone.length < 10) {
+      alert("Invalid phone number");
+      return;
+    }
 
-      const message = `
-🧾 *Booking Invoice*
+    // 2️⃣ Generate invoice (backend)
+    const res = await fetch(
+      `/api/booking/send-invoice/${booking.id}`,
+      { method: "POST" }
+    );
+
+    if (!res.ok) {
+      throw new Error("Backend error");
+    }
+
+    const { publicUrl } = await res.json();
+
+    if (!publicUrl) {
+      alert("Failed to generate invoice link");
+      return;
+    }
+
+    // 3️⃣ Format dates nicely
+    const formatDate = (d) =>
+      new Date(d).toLocaleDateString("en-IN");
+
+    // 4️⃣ WhatsApp message with invoice summary
+    const message = `
+🧾 Booking Invoice
 ━━━━━━━━━━━━━━
-👤 *Guest:* ${booking.guest}
-🏡 *Villa:* ${booking.villa}
-📅 *Check-in:* ${new Date(booking.checkIn).toLocaleDateString()}
-📅 *Check-out:* ${new Date(booking.checkOut).toLocaleDateString()}
-💰 *Amount:* Rs. ${booking.total_amount}
+👤 Guest: ${booking.guest}
+🏡 Villa: ${booking.villa}
+📅 Check-in: ${formatDate(booking.checkIn)}
+📅 Check-out: ${formatDate(booking.checkOut)}
+💰 Amount: ₹${Number(booking.total_amount).toFixed(2)}
 
-📎 *Download Invoice (PDF):* ${data.publicUrl}
+📎 Download Invoice:
+${publicUrl}
 
 Thank you for booking with Shivaam Farms & Resorts 🌿
-`.trim();
+    `.trim();
 
-      const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(
-        message
-      )}`;
+    // 5️⃣ Open WhatsApp to BOOKING NUMBER
+    window.open(
+      `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
+      "_blank"
+    );
 
-      window.open(whatsappUrl, "_blank");
-    } catch (err) {
-      console.error(err);
-      alert("Error sharing invoice.");
-    }
-  };
-
+  } catch (err) {
+    console.error("WhatsApp share failed:", err);
+    alert("Error sharing invoice on WhatsApp");
+  }
+};
 
   return (
     <div className="invoice-overlay">
@@ -305,8 +336,6 @@ Thank you for booking with Shivaam Farms & Resorts 🌿
           <p>Loud music is not allowed after 10:00 PM as per local regulations. Guests must maintain decorum and avoid disturbing other residents.</p>
 
           <p>Pool usage is at the guest’s own risk. Children must be accompanied by adults at all times.</p>
-
-          <p>Reservation is confirmed only upon full or partial payment. Amount once paid is non-refundable but may be rescheduled based on availability.</p>
 
           <p>Management is not responsible for loss of personal belongings, valuables, or unattended items.</p>
         </div>

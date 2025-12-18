@@ -3,7 +3,7 @@ import { sendBookingInvoiceToWhatsApp } from "../controllers/bookingInvoiceContr
 
 const router = express.Router();
 
-// POST → generate PDF and return Supabase URL for WhatsApp
+// Generate invoice PDF and return PUBLIC Supabase URL
 router.post("/booking/send-invoice/:bookingId", sendBookingInvoiceToWhatsApp);
 
 export default router;

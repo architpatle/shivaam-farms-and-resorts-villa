@@ -27,21 +27,23 @@ const NewBooking = ({ onClose, onSave }) => {
   });
 
   const villaOptions = [
-  "All Villas",
-  "Sample Villa",
-  "Khetan Villa",
-  "Madan Villa",
-  "Pandhari Villa",
-  "Dormitory Villa",
-  "Tidke Villa",
-  "Ishan Villa",
-  "Cottage Villa",
-  "Krishna Villa",
-  "Motvani Villa",
-  "Bhatkar villa"
-];
+    "All Villas",
+    "Sample Villa",
+    "Khetan Villa",
+    "Madan Villa",
+    "Pandhari Villa",
+    "Dormitory Villa",
+    "Tidke Villa",
+    "Ishan Villa",
+    "Cottage Villa",
+    "Krishna Villa",
+    "Motvani Villa",
+    "Bhatkar villa"
+  ];
 
   const [dateError, setDateError] = useState("");
+  const [bookingMode, setBookingMode] = useState("single");
+  // "single" | "bulk"
 
   // const normalizeAadharInput = (val) => {
   //   let digits = String(val).replace(/\D/g, "").slice(0, 12);
@@ -202,6 +204,158 @@ const NewBooking = ({ onClose, onSave }) => {
     }
   };
 
+  const BulkBookingForm = ({ villaOptions, onClose, onSave }) => {
+    const [rows, setRows] = useState([
+      {
+        guest: "",
+        phone: "",
+        villa: "Sample Villa",
+        checkIn: "",
+        checkOut: "",
+        guests: 1,
+        baseAmount: "",
+        gstType: "",
+        paymentMode: "",
+        receivedBy: "",
+      },
+    ]);
+
+    const addRow = () => {
+      setRows((prev) => [
+        ...prev,
+        {
+          guest: "",
+          phone: "",
+          villa: "Sample Villa",
+          checkIn: "",
+          checkOut: "",
+          guests: 1,
+          baseAmount: "",
+          gstType: "",
+          paymentMode: "",
+          receivedBy: "",
+        },
+      ]);
+    };
+
+    const updateRow = (index, field, value) => {
+      const updated = [...rows];
+      updated[index][field] = value;
+      setRows(updated);
+    };
+
+    const removeRow = (index) => {
+      setRows(rows.filter((_, i) => i !== index));
+    };
+
+    const handleBulkSubmit = async () => {
+      if (!rows.length) return;
+
+      try {
+        const res = await fetch(
+          "https://shivaam-farms-and-resorts-villa.onrender.com/api/bookings/bulk",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bookings: rows }),
+          }
+        );
+
+        const body = await res.json();
+
+        if (!res.ok) {
+          alert(body.error || "Bulk booking failed");
+          return;
+        }
+
+        alert(`${rows.length} bookings created`);
+        await onSave(body.data);
+        onClose();
+      } catch (err) {
+        alert("Server error");
+      }
+    };
+
+    return (
+      <>
+        {rows.map((row, index) => (
+          <div key={index} className="border rounded p-3 mb-3">
+            <div className="row g-2 align-items-end">
+              <div className="col-md-3">
+                <label>Guest</label>
+                <input
+                  className="form-control"
+                  value={row.guest}
+                  onChange={(e) => updateRow(index, "guest", e.target.value)}
+                />
+              </div>
+
+              <div className="col-md-2">
+                <label>Phone</label>
+                <input
+                  className="form-control"
+                  value={row.phone}
+                  onChange={(e) => updateRow(index, "phone", e.target.value)}
+                />
+              </div>
+
+              <div className="col-md-2">
+                <label>Villa</label>
+                <select
+                  className="form-select"
+                  value={row.villa}
+                  onChange={(e) => updateRow(index, "villa", e.target.value)}
+                >
+                  {villaOptions.map((v) => (
+                    <option key={v} value={v}>{v}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="col-md-2">
+                <label>Check-in</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  value={row.checkIn}
+                  onChange={(e) => updateRow(index, "checkIn", e.target.value)}
+                />
+              </div>
+
+              <div className="col-md-2">
+                <label>Check-out</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  value={row.checkOut}
+                  onChange={(e) => updateRow(index, "checkOut", e.target.value)}
+                />
+              </div>
+
+              <div className="col-md-1 text-end">
+                <button
+                  className="btn btn-outline-danger btn-sm"
+                  onClick={() => removeRow(index)}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        <div className="d-flex justify-content-between">
+          <button className="btn btn-outline-primary" onClick={addRow}>
+            ➕ Add Row
+          </button>
+
+          <button className="btn btn-success" onClick={handleBulkSubmit}>
+            Create Bulk Bookings
+          </button>
+        </div>
+      </>
+    );
+  };
 
   return (
     <div className="new-booking-overlay" role="dialog" aria-modal="true">
@@ -210,50 +364,73 @@ const NewBooking = ({ onClose, onSave }) => {
           <div className="d-flex justify-content-between align-items-center mb-3">
             <div>
               <h5>Create New Booking</h5>
-              <small className="text-muted">Fill details</small>
+              <small className="text-muted">
+                {bookingMode === "single" ? "Single booking" : "Bulk booking"}
+              </small>
             </div>
-            <button className="btn-close" onClick={onClose} aria-label="Close" />
+
+            <div className="d-flex align-items-center gap-2">
+              <div className="btn-group btn-group-sm">
+                <button
+                  type="button"
+                  className={`btn ${bookingMode === "single" ? "btn-success" : "btn-outline-success"}`}
+                  onClick={() => setBookingMode("single")}
+                >
+                  Single
+                </button>
+                <button
+                  type="button"
+                  className={`btn ${bookingMode === "bulk" ? "btn-success" : "btn-outline-success"}`}
+                  onClick={() => setBookingMode("bulk")}
+                >
+                  Bulk
+                </button>
+              </div>
+
+              <button className="btn-close" onClick={onClose} />
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="row g-3">
-            <div className="col-12 col-sm-6">
-              <label>Guest Name</label>
-              <input name="guest" value={formData.guest} onChange={handleChange} className="form-control" />
-            </div>
+          {bookingMode === "single" ? (
+            <form onSubmit={handleSubmit} className="row g-3">
+              <div className="col-12 col-sm-6">
+                <label>Guest Name</label>
+                <input name="guest" value={formData.guest} onChange={handleChange} className="form-control" />
+              </div>
 
-            <div className="col-12 col-sm-6">
-              <label>Villa</label>
-              <select
-  name="villa"
-  value={formData.villa}
-  onChange={handleChange}
-  className="form-select"
->
-  {villaOptions.map((villa, index) => (
-    <option key={index} value={villa}>
-      {villa}
-    </option>
-  ))}
-</select>
+              <div className="col-12 col-sm-6">
+                <label>Villa</label>
+                <select
+                  name="villa"
+                  value={formData.villa}
+                  onChange={handleChange}
+                  className="form-select"
+                >
+                  {villaOptions.map((villa, index) => (
+                    <option key={index} value={villa}>
+                      {villa}
+                    </option>
+                  ))}
+                </select>
 
-            </div>
+              </div>
 
-            {/* <div className="col-12 col-sm-6">
+              {/* <div className="col-12 col-sm-6">
               <label>Email</label>
               <input name="email" type="email" value={formData.email} onChange={handleChange} className="form-control" />
             </div> */}
 
-            <div className="col-12 col-sm-6">
-              <label>Phone</label>
-              <input name="phone" value={formData.phone} onChange={handleChange} className="form-control" />
-            </div>
+              <div className="col-12 col-sm-6">
+                <label>Phone</label>
+                <input name="phone" value={formData.phone} onChange={handleChange} className="form-control" />
+              </div>
 
-            <div className="col-12 col-sm-6">
-              <label>Address</label>
-              <textarea name="address" value={formData.address} onChange={handleChange} className="form-control" rows="2" />
-            </div>
+              <div className="col-12 col-sm-6">
+                <label>Address</label>
+                <textarea name="address" value={formData.address} onChange={handleChange} className="form-control" rows="2" />
+              </div>
 
-            {/* <div className="col-12 col-sm-6">
+              {/* <div className="col-12 col-sm-6">
               <label>Aadhar</label>
               <input name="aadhar" value={formData.aadhar} onChange={handleAadharChange} className="form-control" maxLength={14} />
               {formData.aadhar && formData.aadhar.replace(/\s/g, "").length !== 12 && (
@@ -261,109 +438,116 @@ const NewBooking = ({ onClose, onSave }) => {
               )}
             </div> */}
 
-            <div className="col-12 col-sm-6">
-              <label>Check-in</label>
-              <input name="checkIn" type="date" value={formData.checkIn} onChange={handleChange} className="form-control" min={new Date().toISOString().split("T")[0]} />
-            </div>
+              <div className="col-12 col-sm-6">
+                <label>Check-in</label>
+                <input name="checkIn" type="date" value={formData.checkIn} onChange={handleChange} className="form-control" min={new Date().toISOString().split("T")[0]} />
+              </div>
 
-            <div className="col-12 col-sm-6">
-              <label>Check-out</label>
-              <input name="checkOut" type="date" value={formData.checkOut} onChange={handleChange} className="form-control" min={formData.checkIn ? new Date(new Date(formData.checkIn).getTime() + 86400000).toISOString().split("T")[0] : new Date().toISOString().split("T")[0]} />
-            </div>
+              <div className="col-12 col-sm-6">
+                <label>Check-out</label>
+                <input name="checkOut" type="date" value={formData.checkOut} onChange={handleChange} className="form-control" min={formData.checkIn ? new Date(new Date(formData.checkIn).getTime() + 86400000).toISOString().split("T")[0] : new Date().toISOString().split("T")[0]} />
+              </div>
 
-            <div className="col-12 col-sm-6">
-              <label>Nights</label>
-              <input value={formData.nights ? `${formData.nights} nights` : ""} readOnly className="form-control" />
-            </div>
+              <div className="col-12 col-sm-6">
+                <label>Nights</label>
+                <input value={formData.nights ? `${formData.nights} nights` : ""} readOnly className="form-control" />
+              </div>
 
-            <div className="col-12 col-sm-6">
-              <label>Guests</label>
-              <input name="guests" type="number" min="1" value={formData.guests} onChange={handleChange} className="form-control" />
-            </div>
+              <div className="col-12 col-sm-6">
+                <label>Guests</label>
+                <input name="guests" type="number" min="1" value={formData.guests} onChange={handleChange} className="form-control" />
+              </div>
 
-            <div className="col-12 col-sm-6">
-              <label>Base Amount (₹)</label>
-              <input name="baseAmount" type="number" value={formData.baseAmount} onChange={handleChange} className="form-control" />
-            </div>
+              <div className="col-12 col-sm-6">
+                <label>Base Amount (₹)</label>
+                <input name="baseAmount" type="number" value={formData.baseAmount} onChange={handleChange} className="form-control" />
+              </div>
 
-            <div className="col-12 col-sm-6">
-              <label>GST Type</label>
-              <select name="gstType" value={formData.gstType} onChange={handleChange} className="form-select">
-                <option value="">Select</option>
-                <option value="CGST + SGST (9% + 9%)">CGST + SGST (9% + 9%)</option>
-                <option value="IGST (18%)">IGST (18%)</option>
-              </select>
-            </div>
+              <div className="col-12 col-sm-6">
+                <label>GST Type</label>
+                <select name="gstType" value={formData.gstType} onChange={handleChange} className="form-select">
+                  <option value="">Select</option>
+                  <option value="CGST + SGST (9% + 9%)">CGST + SGST (9% + 9%)</option>
+                  <option value="IGST (18%)">IGST (18%)</option>
+                </select>
+              </div>
 
-            <div className="col-12 col-sm-6">
-              <label>Payment Mode</label>
-              <select name="paymentMode" value={formData.paymentMode} onChange={handleChange} className="form-select">
-                <option value="">Select</option>
-                <option value="Cash">Cash</option>
-                <option value="Online">Online</option>
-              </select>
-            </div>
+              <div className="col-12 col-sm-6">
+                <label>Payment Mode</label>
+                <select name="paymentMode" value={formData.paymentMode} onChange={handleChange} className="form-select">
+                  <option value="">Select</option>
+                  <option value="Cash">Cash</option>
+                  <option value="Online">Online</option>
+                </select>
+              </div>
 
-            <div className="col-12 col-sm-6">
-              <label>Payment Category</label>
-              <div>
-                <div className="form-check form-check-inline">
-                  <input className="form-check-input" type="radio" id="pcTotal" name="paymentCategory" value="Total" checked={formData.paymentCategory === "Total"} onChange={handleChange} />
-                  <label className="form-check-label" htmlFor="pcTotal">Total</label>
-                </div>
-                <div className="form-check form-check-inline">
-                  <input className="form-check-input" type="radio" id="pcAdv" name="paymentCategory" value="Advanced" checked={formData.paymentCategory === "Advanced"} onChange={handleChange} />
-                  <label className="form-check-label" htmlFor="pcAdv">Advanced</label>
+              <div className="col-12 col-sm-6">
+                <label>Payment Category</label>
+                <div>
+                  <div className="form-check form-check-inline">
+                    <input className="form-check-input" type="radio" id="pcTotal" name="paymentCategory" value="Total" checked={formData.paymentCategory === "Total"} onChange={handleChange} />
+                    <label className="form-check-label" htmlFor="pcTotal">Total</label>
+                  </div>
+                  <div className="form-check form-check-inline">
+                    <input className="form-check-input" type="radio" id="pcAdv" name="paymentCategory" value="Advanced" checked={formData.paymentCategory === "Advanced"} onChange={handleChange} />
+                    <label className="form-check-label" htmlFor="pcAdv">Advanced</label>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-<div className="col-12 col-sm-6">
-  <label>Customer Payment (₹)</label>
-  <input
-    value={
-      formData.paymentCategory === "Advanced"
-        ? formData.advancedAmount
-        : formData.totalAmount
-    }
-    readOnly
-    className="form-control"
-  />
-</div>
+
+              <div className="col-12 col-sm-6">
+                <label>Customer Payment (₹)</label>
+                <input
+                  value={
+                    formData.paymentCategory === "Advanced"
+                      ? formData.advancedAmount
+                      : formData.totalAmount
+                  }
+                  readOnly
+                  className="form-control"
+                />
+              </div>
 
 
 
-            {formData.paymentCategory === "Advanced" && (
-              <>
-                <div className="col-12 col-sm-6">
-                  <label>Advanced Amount (₹)</label>
-                  <input name="advancedAmount" type="number" value={formData.advancedAmount} onChange={handleChange} className="form-control" />
-                </div>
+              {formData.paymentCategory === "Advanced" && (
+                <>
+                  <div className="col-12 col-sm-6">
+                    <label>Advanced Amount (₹)</label>
+                    <input name="advancedAmount" type="number" value={formData.advancedAmount} onChange={handleChange} className="form-control" />
+                  </div>
 
-                <div className="col-12 col-sm-6">
-                  <label>Remaining (₹)</label>
-                  <input value={formData.remainingAmount} readOnly className="form-control" />
-                </div>
-              </>
-            )}
+                  <div className="col-12 col-sm-6">
+                    <label>Remaining (₹)</label>
+                    <input value={formData.remainingAmount} readOnly className="form-control" />
+                  </div>
+                </>
+              )}
 
-            <div className="col-12 col-sm-6">
-              <label>Total Amount (auto)</label>
-              <input value={formData.totalAmount} readOnly className="form-control" />
-            </div>
+              <div className="col-12 col-sm-6">
+                <label>Total Amount (auto)</label>
+                <input value={formData.totalAmount} readOnly className="form-control" />
+              </div>
 
-            <div className="col-12 col-sm-6">
-              <label>Received By</label>
-              <input name="receivedBy" value={formData.receivedBy} onChange={handleChange} className="form-control" />
-            </div>
+              <div className="col-12 col-sm-6">
+                <label>Received By</label>
+                <input name="receivedBy" value={formData.receivedBy} onChange={handleChange} className="form-control" />
+              </div>
 
-            {dateError && <div className="col-12"><small className="text-danger">{dateError}</small></div>}
+              {dateError && <div className="col-12"><small className="text-danger">{dateError}</small></div>}
 
-            <div className="col-12 d-flex justify-content-end gap-2">
-              <button type="button" className="btn btn-outline-secondary" onClick={onClose}>Cancel</button>
-              <button type="submit" className="btn btn-success">Create Booking</button>
-            </div>
-          </form>
+              <div className="col-12 d-flex justify-content-end gap-2">
+                <button type="button" className="btn btn-outline-secondary" onClick={onClose}>Cancel</button>
+                <button type="submit" className="btn btn-success">Create Booking</button>
+              </div>
+            </form>
+          ) : (
+            <BulkBookingForm
+              villaOptions={villaOptions}
+              onClose={onClose}
+              onSave={onSave}
+            />
+          )}
         </div>
       </div>
     </div>
