@@ -27,17 +27,23 @@ export const sendBookingInvoiceToWhatsApp = async (req, res) => {
     console.log("🧾 HTML generated");
 
     console.log("🚀 Launching Puppeteer...");
-    const browser = await puppeteer.launch({
-  args: chromium.args,
-  defaultViewport: chromium.defaultViewport,
-  executablePath: await chromium.executablePath(),
-  headless: chromium.headless,
-});
+    const executablePath =
+      process.env.NODE_ENV === "production"
+        ? await chromium.executablePath()
+        : undefined;
 
+    const browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath,
+      headless: chromium.headless,
+    });
 
     const page = await browser.newPage();
+
     await page.setContent(html, {
-      waitUntil: "domcontentloaded",
+      waitUntil: "networkidle0",
+      timeout: 0,
     });
 
     const pdfBuffer = await page.pdf({
@@ -63,17 +69,13 @@ export const sendBookingInvoiceToWhatsApp = async (req, res) => {
       return res.status(500).json({ error: "Upload failed" });
     }
 
-    const { data } = supabase.storage
-      .from("invoices")
-      .getPublicUrl(fileName);
+    const { data } = supabase.storage.from("invoices").getPublicUrl(fileName);
 
     console.log("✅ Public URL:", data.publicUrl);
 
     res.json({ publicUrl: data.publicUrl });
-
   } catch (err) {
     console.error("🔥 BOOKING INVOICE ERROR:", err);
     res.status(500).json({ error: "Failed to generate invoice" });
   }
 };
-
