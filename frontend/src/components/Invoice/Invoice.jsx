@@ -41,12 +41,10 @@ const Invoice = ({ booking, onClose }) => {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(34);
     doc.setTextColor(220, 220, 220);
-    doc.text(
-      "SHIVAAM FARMS & RESORTS",
-      pageWidth / 2,
-      160,
-      { align: "center", angle: 42 }
-    );
+    doc.text("SHIVAAM FARMS & RESORTS", pageWidth / 2, 160, {
+      align: "center",
+      angle: 42,
+    });
 
     /* ---------------- HEADER ---------------- */
     doc.setTextColor(0, 100, 0); // Green color for company name
@@ -60,8 +58,16 @@ const Invoice = ({ booking, onClose }) => {
 
     // Using `new Date().toLocaleString()` for current date/time on the right
     doc.text(`Date: ${new Date().toLocaleString()}`, pageWidth - 80, 20);
-    doc.text(`Check-in: ${new Date(booking.checkIn).toLocaleDateString()}`, pageWidth - 80, 26);
-    doc.text(`Check-out: ${new Date(booking.checkOut).toLocaleDateString()}`, pageWidth - 80, 32);
+    doc.text(
+      `Check-in: ${new Date(booking.checkIn).toLocaleDateString()}`,
+      pageWidth - 80,
+      26
+    );
+    doc.text(
+      `Check-out: ${new Date(booking.checkOut).toLocaleDateString()}`,
+      pageWidth - 80,
+      32
+    );
     doc.text(`Guests: ${booking.guests}`, pageWidth - 80, 38);
 
     /* ---------------- GUEST DETAILS ---------------- */
@@ -95,7 +101,7 @@ const Invoice = ({ booking, onClose }) => {
     y += 14;
     doc.setFont("helvetica", "normal");
     doc.text(booking.villa, 20, y);
-    doc.text(`Rs. ${booking.base_amount}`, 105, y);;
+    doc.text(`Rs. ${booking.base_amount}`, 105, y);
     doc.text("1", 142, y);
     doc.text(`Rs. ${booking.base_amount}`, 170, y);
 
@@ -140,7 +146,7 @@ const Invoice = ({ booking, onClose }) => {
     doc.text(`Received By: ${booking.received_by}`, 15, y);
     // Removed Remaining amount line as it is not in the image.
     // y += 6;
-    // doc.text(`Remaining: Rs. ${booking.remaining_amount}`, 15, y); 
+    // doc.text(`Remaining: Rs. ${booking.remaining_amount}`, 15, y);
 
     /* ---------------- TERMS ---------------- */
     y += 12;
@@ -156,65 +162,63 @@ const Invoice = ({ booking, onClose }) => {
       "3. Outside food delivery is strictly prohibited unless written permission is granted by management.",
       "4. Loud music is not allowed after 10:00 PM as per local regulations. Guests must maintain decorum and avoid disturbing other residents.",
       "5. Pool usage is at the guest’s own risk. Children must be accompanied by adults at all times.",
-      "6. Management is not responsible for loss of personal belongings, valuables, or unattended items."
+      "6. Management is not responsible for loss of personal belongings, valuables, or unattended items.",
     ];
 
     doc.text(terms, 15, y, { maxWidth: 180 });
 
-
     /* ---------------- FOOTER ---------------- */
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
-    doc.text("Thank you for visiting!", pageWidth / 2, 290, { align: "center" });
+    doc.text("Thank you for visiting!", pageWidth / 2, 290, {
+      align: "center",
+    });
 
     /* SAVE */
     if (!silent) {
       doc.save(`Invoice_${booking.guest}_${booking.villa}.pdf`);
     }
     return doc;
-
   };
 
   // ------------------------- SHARE VIA WHATSAPP -------------------------
-const handleShareWhatsApp = async () => {
-  try {
-    // 1️⃣ Validate phone number
-    if (!booking.phone) {
-      alert("No phone number found for this booking");
-      return;
-    }
+  const handleShareWhatsApp = async () => {
+    try {
+      if (!booking.phone) {
+        alert("No phone number found for this booking");
+        return;
+      }
 
-    // WhatsApp requires digits only + country code
-    const phone = booking.phone.replace(/\D/g, "");
+      const phone = booking.phone.replace(/\D/g, "");
 
-    if (phone.length < 10) {
-      alert("Invalid phone number");
-      return;
-    }
+      if (phone.length < 10) {
+        alert("Invalid phone number");
+        return;
+      }
 
-    // 2️⃣ Generate invoice (backend)
-    const res = await fetch(
-      `/api/booking/send-invoice/${booking.id}`,
-      { method: "POST" }
-    );
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-    if (!res.ok) {
-      throw new Error("Backend error");
-    }
+      const res = await fetch(
+        `${API_BASE_URL}/api/booking/send-invoice/${booking.id}`,
+        { method: "POST" }
+      );
 
-    const { publicUrl } = await res.json();
+      const data = await res.json();
 
-    if (!publicUrl) {
-      alert("Failed to generate invoice link");
-      return;
-    }
+      if (!res.ok) {
+        throw new Error(data.error || "Backend error");
+      }
 
-    // 3️⃣ Format dates nicely
-    const formatDate = (d) =>
-      new Date(d).toLocaleDateString("en-IN");
+      const { publicUrl } = data;
 
-    // 4️⃣ WhatsApp message with invoice summary
-    const message = `
+      if (!publicUrl) {
+        alert("Failed to generate invoice link");
+        return;
+      }
+
+      const formatDate = (d) => new Date(d).toLocaleDateString("en-IN");
+
+      const message = `
 🧾 Booking Invoice
 ━━━━━━━━━━━━━━
 👤 Guest: ${booking.guest}
@@ -227,51 +231,64 @@ const handleShareWhatsApp = async () => {
 ${publicUrl}
 
 Thank you for booking with Shivaam Farms & Resorts 🌿
-    `.trim();
+`.trim();
 
-    // 5️⃣ Open WhatsApp to BOOKING NUMBER
-    window.open(
-      `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
-      "_blank"
-    );
-
-  } catch (err) {
-    console.error("WhatsApp share failed:", err);
-    alert("Error sharing invoice on WhatsApp");
-  }
-};
+      window.open(
+        `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
+        "_blank"
+      );
+    } catch (err) {
+      console.error("WhatsApp share failed:", err);
+      alert(err.message);
+    }
+  };
 
   return (
     <div className="invoice-overlay">
       <div className="invoice-container shadow-lg rounded-3 p-4">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h4 className="fw-bold text-success">Invoice</h4>
-          <button className="btn btn-outline-danger" onClick={onClose}>✕ Close</button>
+          <button className="btn btn-outline-danger" onClick={onClose}>
+            ✕ Close
+          </button>
         </div>
 
         {/* COMPANY HEADER */}
-        <h5 className="fw-bold text-center text-success">
-          {company.name}
-        </h5>
+        <h5 className="fw-bold text-center text-success">{company.name}</h5>
         <p className="text-center small text-muted mb-3">
-          {company.address} | {company.phone} | 
-          {/* {company.email} */}
+          {company.address} | {company.phone} |{/* {company.email} */}
         </p>
 
         {/* GUEST + BOOKING DETAILS */}
         <div className="row mb-3">
           <div className="col-md-6">
-            <p><strong>Guest:</strong> {booking.guest}</p>
+            <p>
+              <strong>Guest:</strong> {booking.guest}
+            </p>
             {/* <p><strong>Email:</strong> {booking.email}</p> */}
-            <p><strong>Phone:</strong> {booking.phone || "-"}</p>
-            <p><strong>Villa:</strong> {booking.villa}</p>
+            <p>
+              <strong>Phone:</strong> {booking.phone || "-"}
+            </p>
+            <p>
+              <strong>Villa:</strong> {booking.villa}
+            </p>
           </div>
 
           <div className="col-md-6 text-md-end">
-            <p><strong>Date:</strong> {new Date().toLocaleString()}</p>
-            <p><strong>Check-in:</strong> {new Date(booking.checkIn).toLocaleDateString()}</p>
-            <p><strong>Check-out:</strong> {new Date(booking.checkOut).toLocaleDateString()}</p>
-            <p><strong>Guests:</strong> {booking.guests}</p>
+            <p>
+              <strong>Date:</strong> {new Date().toLocaleString()}
+            </p>
+            <p>
+              <strong>Check-in:</strong>{" "}
+              {new Date(booking.checkIn).toLocaleDateString()}
+            </p>
+            <p>
+              <strong>Check-out:</strong>{" "}
+              {new Date(booking.checkOut).toLocaleDateString()}
+            </p>
+            <p>
+              <strong>Guests:</strong> {booking.guests}
+            </p>
           </div>
         </div>
 
@@ -306,7 +323,12 @@ Thank you for booking with Shivaam Farms & Resorts 🌿
           </thead>
           <tbody>
             {gstRows.map((row, idx) => (
-              <tr key={idx} className={idx === gstRows.length - 1 ? "table-info fw-bold" : ""}>
+              <tr
+                key={idx}
+                className={
+                  idx === gstRows.length - 1 ? "table-info fw-bold" : ""
+                }
+              >
                 <td>{row.label}</td>
                 <td>₹{row.value.toFixed(2)}</td>
               </tr>
@@ -319,8 +341,12 @@ Thank you for booking with Shivaam Farms & Resorts 🌿
         </table>
 
         {/* EXTRA INFO */}
-        <p className="mt-3"><strong>Payment Mode:</strong> {booking.payment_mode}</p>
-        <p><strong>Received By:</strong> {booking.received_by}</p>
+        <p className="mt-3">
+          <strong>Payment Mode:</strong> {booking.payment_mode}
+        </p>
+        <p>
+          <strong>Received By:</strong> {booking.received_by}
+        </p>
 
         {/* TERMS */}
         <div className="mt-4 small">
@@ -328,19 +354,37 @@ Thank you for booking with Shivaam Farms & Resorts 🌿
 
           {/* <p>For security, 5 member Aadhar cards are required during check-in. They will be returned during check-out.</p> */}
 
-          <p>Check-in time is 1:00 PM and check-out time is 11:00 AM. Early check-in or late check-out is subject to availability and may incur additional charges.</p>
+          <p>
+            Check-in time is 1:00 PM and check-out time is 11:00 AM. Early
+            check-in or late check-out is subject to availability and may incur
+            additional charges.
+          </p>
 
-          <p>Guests are responsible for any damage caused to villa property, furniture, fixtures, or electrical appliances during their stay.</p>
+          <p>
+            Guests are responsible for any damage caused to villa property,
+            furniture, fixtures, or electrical appliances during their stay.
+          </p>
 
-          <p>Outside food delivery is strictly prohibited unless written permission is granted by management.</p>
+          <p>
+            Outside food delivery is strictly prohibited unless written
+            permission is granted by management.
+          </p>
 
-          <p>Loud music is not allowed after 10:00 PM as per local regulations. Guests must maintain decorum and avoid disturbing other residents.</p>
+          <p>
+            Loud music is not allowed after 10:00 PM as per local regulations.
+            Guests must maintain decorum and avoid disturbing other residents.
+          </p>
 
-          <p>Pool usage is at the guest’s own risk. Children must be accompanied by adults at all times.</p>
+          <p>
+            Pool usage is at the guest’s own risk. Children must be accompanied
+            by adults at all times.
+          </p>
 
-          <p>Management is not responsible for loss of personal belongings, valuables, or unattended items.</p>
+          <p>
+            Management is not responsible for loss of personal belongings,
+            valuables, or unattended items.
+          </p>
         </div>
-
 
         {/* DOWNLOAD BUTTON */}
         <div className="text-center mt-4">
@@ -353,14 +397,12 @@ Thank you for booking with Shivaam Farms & Resorts 🌿
           >
             ⬇️ Download Invoice
           </button>
-
         </div>
         <div className="text-center mt-2">
           <button className="btn btn-primary" onClick={handleShareWhatsApp}>
             📤 Share via WhatsApp
           </button>
         </div>
-
       </div>
     </div>
   );
