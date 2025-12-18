@@ -6,7 +6,10 @@ import { generateBookingInvoiceHTML } from "../Template/generateBookingInvoiceHT
 
 export const sendBookingInvoiceToWhatsApp = async (req, res) => {
   console.log("🔥 sendBookingInvoiceToWhatsApp HIT");
+
+  // ✅ Parse bookingId ONCE
   const bookingId = Number(req.params.bookingId);
+  console.log("📌 bookingId:", bookingId);
 
   if (!bookingId || isNaN(bookingId)) {
     return res.status(400).json({
@@ -15,14 +18,9 @@ export const sendBookingInvoiceToWhatsApp = async (req, res) => {
   }
 
   try {
-    const { bookingId } = req.params;
-    console.log("📌 bookingId:", bookingId);
-
     // 1️⃣ Fetch booking
-    const result = await getBookingById(Number(bookingId));
-    console.log("📦 getBookingById result:", result);
-
-    const { data: booking, error } = result;
+    const { data: booking, error } = await getBookingById(bookingId);
+    console.log("📦 getBookingById result:", booking);
 
     if (error || !booking) {
       console.error("❌ Booking fetch failed:", error);
@@ -35,13 +33,12 @@ export const sendBookingInvoiceToWhatsApp = async (req, res) => {
     const html = generateBookingInvoiceHTML(booking);
     console.log("🧾 HTML generated");
 
-    // 3️⃣ Launch Puppeteer (Local vs Render)
+    // 3️⃣ Launch Puppeteer
     console.log("🚀 Launching Puppeteer...");
 
     let browser;
 
     if (process.env.RENDER) {
-      // ✅ Render (Linux)
       browser = await puppeteer.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
@@ -49,7 +46,6 @@ export const sendBookingInvoiceToWhatsApp = async (req, res) => {
         headless: chromium.headless,
       });
     } else {
-      // ✅ Local (Windows / Mac)
       browser = await puppeteer.launch({
         headless: true,
         executablePath:
@@ -57,6 +53,8 @@ export const sendBookingInvoiceToWhatsApp = async (req, res) => {
         args: ["--no-sandbox"],
       });
     }
+
+    console.log("✅ Puppeteer launched");
 
     // 4️⃣ Render PDF
     const page = await browser.newPage();
@@ -91,15 +89,17 @@ export const sendBookingInvoiceToWhatsApp = async (req, res) => {
     }
 
     // 6️⃣ Get public URL
-    const { data } = supabase.storage.from("invoices").getPublicUrl(fileName);
+    const { data } = supabase.storage
+      .from("invoices")
+      .getPublicUrl(fileName);
 
     console.log("✅ Public URL:", data.publicUrl);
 
-    // 7️⃣ Send response
-    res.json({ publicUrl: data.publicUrl });
+    // 7️⃣ Respond
+    return res.json({ publicUrl: data.publicUrl });
   } catch (err) {
     console.error("🔥 BOOKING INVOICE ERROR:", err);
-    res.status(500).json({
+    return res.status(500).json({
       error: err.message || "Failed to generate invoice",
     });
   }
