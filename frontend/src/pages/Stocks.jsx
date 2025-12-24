@@ -17,7 +17,7 @@ const Stocks = () => {
   );
   const fetchStocks = async () => {
     try {
-      const res = await fetch("https://shivaam-farms-and-resorts-villa.onrender.com/api/stocks");
+      const res = await fetch("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/stocks");
       const data = await res.json();
       setItems(data);
     } catch (err) {
@@ -61,7 +61,7 @@ const Stocks = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("https://shivaam-farms-and-resorts-villa.onrender.com/api/stocks", {
+      const res = await fetch("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/stocks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

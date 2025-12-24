@@ -33,12 +33,12 @@ const OverviewCharts = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const bookingsRes = await axios.get("https://shivaam-farms-and-resorts-villa.onrender.com/api/bookings");
+        const bookingsRes = await axios.get("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/bookings");
         const bookings = Array.isArray(bookingsRes.data)
           ? bookingsRes.data
           : bookingsRes.data.bookings || bookingsRes.data.data || [];
 
-        const stocksRes = await axios.get("https://shivaam-farms-and-resorts-villa.onrender.com/api/stocks");
+        const stocksRes = await axios.get("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/stocks");
         const stocks = Array.isArray(stocksRes.data)
           ? stocksRes.data
           : stocksRes.data.stocks || stocksRes.data.data || [];
@@ -86,7 +86,7 @@ const OverviewCharts = () => {
   useEffect(() => {
     const fetchExpenseBreakdown = async () => {
       try {
-        const res = await axios.get("https://shivaam-farms-and-resorts-villa.onrender.com/api/stocks");
+        const res = await axios.get("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/stocks");
         const items = res.data;
 
         const categoryTotals = {};

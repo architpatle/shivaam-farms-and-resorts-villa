@@ -177,7 +177,7 @@ const NewBooking = ({ onClose, onSave }) => {
     };
 
     try {
-      const res = await fetch("https://shivaam-farms-and-resorts-villa.onrender.com/api/bookings", {
+      const res = await fetch("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -253,7 +253,7 @@ const NewBooking = ({ onClose, onSave }) => {
 
       try {
         const res = await fetch(
-          "https://shivaam-farms-and-resorts-villa.onrender.com/api/bookings/bulk",
+          "https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/bookings/bulk",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

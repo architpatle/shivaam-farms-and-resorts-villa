@@ -97,7 +97,7 @@ const Booking = () => {
 
   const fetchBookings = async () => {
     try {
-      const res = await fetch("https://shivaam-farms-and-resorts-villa.onrender.com/api/bookings");
+      const res = await fetch("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/bookings");
       const json = await res.json();
 
       if (!json.data) return;
@@ -143,7 +143,7 @@ const Booking = () => {
     if (!window.confirm("Are you sure you want to delete this booking?")) return;
 
     try {
-      const res = await fetch(`https://shivaam-farms-and-resorts-villa.onrender.com/api/bookings/${id}`, {
+      const res = await fetch(`https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/bookings/${id}`, {
         method: "DELETE",
       });
       // const data = await res.json();
@@ -166,7 +166,7 @@ const Booking = () => {
 
     try {
       const response = await fetch(
-        `https://shivaam-farms-and-resorts-villa.onrender.com/api/bookings/${bookingId}`,
+        `https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/bookings/${bookingId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

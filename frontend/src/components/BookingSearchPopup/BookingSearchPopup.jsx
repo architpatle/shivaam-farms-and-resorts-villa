@@ -36,7 +36,7 @@ const BookingSearchPopup = ({ onClose, onSelect }) => {
     const fetchBookings = async () => {
       try {
         setLoading(true);
-        const res = await axios.get("https://shivaam-farms-and-resorts-villa.onrender.com/api/bookings?checked_in=false");
+        const res = await axios.get("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/bookings?checked_in=false");
         const data = res.data.data || [];
         setBookings(data);
 

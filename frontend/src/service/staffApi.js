@@ -1,4 +1,4 @@
-const API_URL = "https://shivaam-farms-and-resorts-villa.onrender.com/staff"; // ✅ match backend route
+const API_URL = "https://shivaam-farms-and-resorts-villa-kynh.onrender.com/staff"; // ✅ match backend route
 
 export const getStaff = async () => {
     const res = await fetch(API_URL);

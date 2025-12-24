@@ -16,7 +16,7 @@ const RecentTransactions = () => {
     let bookingData = [];
 
     axios
-      .get("https://shivaam-farms-and-resorts-villa.onrender.com/api/stocks")
+      .get("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/stocks")
       .then((res) => {
         if (Array.isArray(res.data)) {
           stockData = res.data.map((item) => ({
@@ -38,7 +38,7 @@ const RecentTransactions = () => {
             total_amount: Number(item.price) || 0, // still keeping total_amount for summary
           }));
         }
-        return axios.get("https://shivaam-farms-and-resorts-villa.onrender.com/api/bookings");
+        return axios.get("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/bookings");
       })
       .then((res) => {
         const bookingArray = Array.isArray(res.data)

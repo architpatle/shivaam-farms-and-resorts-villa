@@ -32,7 +32,7 @@ const CheckInForm = () => {
   useEffect(() => {
     const fetchCheckIns = async () => {
       try {
-        const res = await fetch("https://shivaam-farms-and-resorts-villa.onrender.com/api/checkins");
+        const res = await fetch("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/checkins");
         const data = await res.json();
         if (data.success) {
           const mappedData = data.data.map((item) => ({
@@ -80,7 +80,7 @@ const CheckInForm = () => {
 
   const openSearch = async () => {
     try {
-      const res = await fetch("https://shivaam-farms-and-resorts-villa.onrender.com/api/bookings");
+      const res = await fetch("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/bookings");
       const data = await res.json();
       setAllBookings(data.data || []);
       setShowSearch(true);
@@ -96,7 +96,7 @@ const CheckInForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("https://shivaam-farms-and-resorts-villa.onrender.com/api/checkins", {
+      const res = await fetch("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/checkins", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -106,7 +106,7 @@ const CheckInForm = () => {
       if (!res.ok) throw new Error(result.error || "Failed to save check-in");
 
       // Refetch all check-ins (your existing code)
-      const fetchRes = await fetch("https://shivaam-farms-and-resorts-villa.onrender.com/api/checkins");
+      const fetchRes = await fetch("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/checkins");
       const fetchedData = await fetchRes.json();
       if (fetchedData.success) {
         const mappedData = fetchedData.data.map((item) => ({

@@ -8,7 +8,7 @@ const CalendarPage = () => {
     const fetchBookings = async () => {
       try {
         const res = await fetch(
-          "https://shivaam-farms-and-resorts-villa.onrender.com/api/bookings"
+          "https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/bookings"
         );
 
         const { data } = await res.json();

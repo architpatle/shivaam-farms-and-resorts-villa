@@ -46,7 +46,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchBookingsData = async () => {
       try {
-        const res = await fetch("https://shivaam-farms-and-resorts-villa.onrender.com/api/bookings");
+        const res = await fetch("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/bookings");
         const { data } = await res.json();
         setTotalBookings(data.length || 0);
 
@@ -67,7 +67,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchStocks = async () => {
       try {
-        const res = await fetch("https://shivaam-farms-and-resorts-villa.onrender.com/api/stocks");
+        const res = await fetch("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/stocks");
         const data = await res.json();
         setItems(data);
       } catch (err) {

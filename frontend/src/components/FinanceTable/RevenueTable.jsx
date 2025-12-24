@@ -34,7 +34,7 @@ const RevenueTable = () => {
   useEffect(() => {
     const fetchBookingRevenue = async () => {
       try {
-        const res = await axios.get("https://shivaam-farms-and-resorts-villa.onrender.com/api/bookings");
+        const res = await axios.get("https://shivaam-farms-and-resorts-villa-kynh.onrender.com/api/bookings");
         const bookings = Array.isArray(res.data)
           ? res.data
           : res.data.bookings || res.data.data || [];
